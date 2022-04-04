@@ -7,8 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"gopkg.in/go-playground/validator.v9"
 	pg "gym/internal/db/postgres"
-	class "gym/pkg/class"
-	member "gym/pkg/member"
+	"gym/pkg/booking"
+	"gym/pkg/class"
+	"gym/pkg/member"
 	"log"
 	"net/http"
 	"os"
@@ -37,13 +38,14 @@ func main() {
 	postgresConn := pg.NewPostgresConnectionPool(defaultPostgresURILocal)
 	classRepository := class.NewRepository(postgresConn)
 	memberRepository := member.NewRepository(postgresConn)
+	bookingRepository := booking.NewRepository(postgresConn)
 
 	// HTTP HANDLERS
 	validator := validator.New()
 	r.GET("/", handleVersion)
 	class.NewHandler(r, "classes", validator, classRepository)
 	member.NewHandler(r, "members", validator, memberRepository)
-	//class.NewHandler(r, "bookings", validator, classRepository)
+	booking.NewHandler(r, "bookings", validator, bookingRepository)
 
 	// SERVER SETUP
 	port := os.Getenv("GIN_PORT")

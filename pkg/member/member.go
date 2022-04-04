@@ -1,4 +1,4 @@
-package booking
+package member
 
 import "time"
 

@@ -1,4 +1,4 @@
-package booking
+package member
 
 import (
 	"github.com/gin-gonic/gin"

@@ -1,1 +1,3 @@
 DROP TABLE IF EXISTS "class";
+DROP TABLE IF EXISTS "member";
+DROP TABLE IF EXISTS "booking";

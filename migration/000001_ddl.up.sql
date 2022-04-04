@@ -19,8 +19,10 @@ CREATE TABLE IF NOT EXISTS booking(
     id serial PRIMARY KEY, -- surrogate key to allow many bookings to be made for a single class
     class_id    int REFERENCES class (id) ON UPDATE CASCADE ON DELETE CASCADE,
     member_id   int REFERENCES member(id) ON UPDATE CASCADE,
-    date TIMESTAMP UNIQUE NOT NULL,
-    creation_time TIMESTAMP NOT NULL DEFAULT NOW()
+    date TIMESTAMP NOT NULL,
+    creation_time TIMESTAMP NOT NULL DEFAULT NOW(),
+    --UNIQUE(class_id, member_id, date), -- a member cannot book the same class twice on the same date
+    UNIQUE(member_id, date) -- a member cannot book a class twice on the same date
 );
 
 -- INDEXES

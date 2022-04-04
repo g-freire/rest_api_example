@@ -85,6 +85,7 @@ func (h *Handler) GetByDateRange(c *gin.Context) {
 	}
 }
 
+// TODO validate start > end
 func (h *Handler) Save(c *gin.Context) {
 	var class Class
 	err := c.BindJSON(&class)

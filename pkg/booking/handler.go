@@ -36,9 +36,8 @@ func NewHandler(r *gin.Engine,
 func (h *Handler) GetAll(c *gin.Context) {
 	limit := c.Query("limit")
 	offset := c.Query("offset")
-	name := c.Query("name")
 
-	result, err := h.BookingRepository.GetAll(limit, offset, name)
+	result, err := h.BookingRepository.GetAll(limit, offset)
 	if err != nil {
 		c.JSON(http.StatusNotFound, c.Error(err))
 	} else {

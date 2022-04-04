@@ -24,16 +24,12 @@ func NewRepository(db *pgxpool.Pool) *postgres {
 
 var ctx = context.TODO()
 
-func (p postgres) GetAll(limit, offset, name string) ([]Booking, error) {
-	var classCollection []Booking
+func (p postgres) GetAll(limit, offset string) ([]Booking, error) {
+	var bookingCollection []Booking
 	var q strings.Builder
 	q.WriteString(`
-		SELECT * FROM class
+		SELECT * FROM booking
 	`)
-	// filter by name
-	if name != "" {
-		q.WriteString(fmt.Sprintf("WHERE name='%s' ", name))
-	}
 	q.WriteString("ORDER BY creation_time DESC ")
 	// request with pagination - default limit is 200 if no limit is specified
 	if limit == "" {
@@ -44,30 +40,30 @@ func (p postgres) GetAll(limit, offset, name string) ([]Booking, error) {
 		q.WriteString("OFFSET ")
 		q.WriteString(offset)
 	}
-	err := pgxscan.Select(ctx, p.db, &classCollection, q.String())
+	err := pgxscan.Select(ctx, p.db, &bookingCollection, q.String())
 	if err != nil {
 		log.Printf("\n[ERROR]:", err)
 		return nil, err
 	}
-	return classCollection, nil
+	return bookingCollection, nil
 }
 
 func (p postgres) GetByID(id string) (Booking, error) {
-	var class Booking
+	var booking Booking
 	sql := `
-			SELECT * FROM class
+			SELECT * FROM booking
 			WHERE id = $1
 		`
-	err := pgxscan.Get(ctx, p.db, &class, sql, id)
+	err := pgxscan.Get(ctx, p.db, &booking, sql, id)
 	if err != nil {
 		log.Printf("\n[ERROR]:", err)
 		return Booking{}, err
 	}
-	return class, nil
+	return booking, nil
 }
 
 func (p postgres) GetTotalCount() (int64, error) {
-	sql := "SELECT COUNT(*) FROM class"
+	sql := "SELECT COUNT(*) FROM booking"
 	var total int64
 	err := p.db.QueryRow(context.Background(), sql).Scan(&total)
 	if err != nil {
@@ -79,20 +75,20 @@ func (p postgres) GetTotalCount() (int64, error) {
 }
 
 func (p postgres) GetByDateRange(startDate, endDate string) ([]Booking, error) {
-	var classCollection []Booking
+	var bookingCollection []Booking
 	sql := `
-		SELECT * FROM class 
+		SELECT * FROM booking 
 		WHERE start_date >= $1 AND end_date <= $2 
 		ORDER BY creation_time DESC`
-	err := pgxscan.Select(ctx, p.db, &classCollection, sql, startDate, endDate)
+	err := pgxscan.Select(ctx, p.db, &bookingCollection, sql, startDate, endDate)
 	if err != nil {
 		log.Printf("\n[ERROR]:", err)
 		return nil, err
 	}
-	return classCollection, nil
+	return bookingCollection, nil
 }
 
-func (p postgres) Save(class Booking) error {
+func (p postgres) Save(booking Booking) error {
 	// saving with pessimistic concurrency control
 	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
@@ -101,17 +97,17 @@ func (p postgres) Save(class Booking) error {
 	defer tx.Rollback(context.TODO())
 
 	tsql := `
-		 INSERT INTO class (
-				  name,
-				  start_date, 
-				  end_date, 
-				  capacity
-				  )
-		 VALUES ($1, $2, $3, $4)`
+		 INSERT INTO booking (
+				  class_id,
+				  member_id, 
+				  date
+				)
+		 VALUES ($1, $2, $3)`
 
 	tran, err := tx.Exec(ctx, tsql,
-		class.Name,
-		class.Date,
+		booking.ClassId,
+		booking.MemberId,
+		booking.Date,
 	)
 	if err != nil {
 		pg.RollbackTxPgx(tx, err)
@@ -133,7 +129,7 @@ func (p postgres) Save(class Booking) error {
 	return nil
 }
 
-func (p postgres) Update(id string, class Booking) error {
+func (p postgres) Update(id string, booking Booking) error {
 	// updating with pessimistic concurrency control
 	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
@@ -142,7 +138,7 @@ func (p postgres) Update(id string, class Booking) error {
 	defer tx.Rollback(context.TODO())
 
 	tsql := `
-		UPDATE class
+		UPDATE booking
 		SET name = $1,
 			start_date = $2,
 			end_date = $3,
@@ -151,8 +147,7 @@ func (p postgres) Update(id string, class Booking) error {
 		;`
 
 	tran, err := tx.Exec(ctx, tsql,
-		class.Name,
-		class.Date,
+		booking.Date,
 		id,
 	)
 	if err != nil {
@@ -177,7 +172,7 @@ func (p postgres) Update(id string, class Booking) error {
 
 func (p postgres) Delete(id string) error {
 	sql := `
-			DELETE FROM class
+			DELETE FROM booking
 			WHERE id = $1;
 	`
 	res, err := p.db.Exec(ctx, sql, id)
