@@ -26,6 +26,8 @@ func NewHandler(r *gin.Engine,
 		v1.GET(":id", handler.GetByID)
 		v1.GET("count", handler.GetTotalCount)
 		v1.GET("date", handler.GetByDateRange)
+		v1.GET("member/:id", handler.GetAllClassesByMemberId)
+		v1.GET("class/:id", handler.GetAllMembersByClassId)
 		v1.POST("", handler.Save)
 		v1.PUT(":id", handler.Update)
 		v1.DELETE(":id", handler.Delete)
@@ -137,5 +139,33 @@ func (h *Handler) Delete(c *gin.Context) {
 		c.JSON(http.StatusNotFound, c.Error(err))
 	} else {
 		c.JSON(http.StatusOK, "Deleted Booking with id "+id+" successfully")
+	}
+}
+
+func (h *Handler) GetAllClassesByMemberId(c *gin.Context) {
+	memberID := c.Param("id")
+	if memberID == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Missing 'id' Query Parameters"})
+		return
+	}
+	result, err := h.BookingRepository.GetAllClassesByMemberId(memberID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, c.Error(err))
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
+
+func (h *Handler) GetAllMembersByClassId(c *gin.Context) {
+	classId := c.Param("id")
+	if classId == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Missing 'id' Query Parameters"})
+		return
+	}
+	result, err := h.BookingRepository.GetAllMembersByClassId(classId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, c.Error(err))
+	} else {
+		c.JSON(http.StatusOK, result)
 	}
 }

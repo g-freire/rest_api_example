@@ -7,6 +7,8 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	pg "gym/internal/db/postgres"
+	"gym/pkg/class"
+	"gym/pkg/member"
 	"log"
 	"os"
 	"strings"
@@ -185,4 +187,38 @@ func (p postgres) Delete(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (p postgres) GetAllClassesByMemberId(memberID string) ([]class.Class, error) {
+	var classCollection []class.Class
+	sql := `
+		SELECT name, start_date, end_date, capacity, c.id, c.creation_time
+		FROM class c
+		INNER JOIN booking b 
+		ON c.id = b.class_id
+		WHERE b.member_id =$1
+		`
+	err := pgxscan.Select(ctx, p.db, &classCollection, sql, memberID)
+	if err != nil {
+		log.Printf("\n[ERROR]:", err)
+		return nil, err
+	}
+	return classCollection, nil
+}
+
+func (p postgres) GetAllMembersByClassId(id string) ([]member.Member, error) {
+	var memberCollection []member.Member
+	sql := `
+		SELECT name, m.id, m.creation_time
+		FROM member m
+		INNER JOIN booking b 
+		ON m.id = b.member_id
+		WHERE b.class_id =$1
+		`
+	err := pgxscan.Select(ctx, p.db, &memberCollection, sql, id)
+	if err != nil {
+		log.Printf("\n[ERROR]:", err)
+		return nil, err
+	}
+	return memberCollection, nil
 }

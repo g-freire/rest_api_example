@@ -38,3 +38,5 @@ go test ./...
 ```bash
 migrate create -ext sql -dir migration -seq some_migration_name
 ```
+
+

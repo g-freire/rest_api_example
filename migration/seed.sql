@@ -9,4 +9,8 @@ INSERT INTO member(name) VALUES  ('Bob');
 INSERT INTO member(name) VALUES  ('Charlie');
 
 -- BOOKING
-INSERT INTO booking(class_id, member_id, date) VALUES (1,1,'2021-12-01' )
+INSERT INTO booking(class_id, member_id, date) VALUES (1,1,'2021-12-01');
+INSERT INTO booking(class_id, member_id, date) VALUES (2,1,'2021-12-02');
+INSERT INTO booking(class_id, member_id, date) VALUES (1,3,'2021-12-01');
+INSERT INTO booking(class_id, member_id, date) VALUES (1,3,'2021-12-02');
+INSERT INTO booking(class_id, member_id, date) VALUES (1,3,'2021-12-03');
