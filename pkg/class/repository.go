@@ -9,6 +9,7 @@ import (
 	pg "gym/internal/db/postgres"
 	"log"
 	"os"
+	"strings"
 )
 
 type postgres struct {
@@ -23,33 +24,46 @@ func NewRepository(db *pgxpool.Pool) *postgres {
 
 var ctx = context.TODO()
 
-func (p postgres) GetAll(limit, offset string) ([]Class, error) {
+func (p postgres) GetAll(limit, offset, name string) ([]Class, error) {
 	var classCollection []Class
-	// request with pagination arguments
-	if limit != "" && offset != "" {
-		sql := `
-			SELECT * FROM class 
-			ORDER BY created_at DESC 
-			LIMIT $1 
-			OFFSET $2
-		`
-		err := pgxscan.Select(ctx, p.db, &classCollection, sql, limit, offset)
-		if err != nil {
-			log.Printf("\n[ERROR]:", err)
-			return nil, err
-		}
-	} else { // request without pagination arguments
-		sql := `
-			SELECT * FROM class 
-			ORDER BY created_at DESC 
-		`
-		err := pgxscan.Select(ctx, p.db, &classCollection, sql)
-		if err != nil {
-			log.Printf("\n[ERROR]:", err)
-			return nil, err
-		}
+	var q strings.Builder
+	q.WriteString(`
+		SELECT * FROM class
+	`)
+	// filter by name
+	if name != "" {
+		q.WriteString(fmt.Sprintf("WHERE name='%s' ", name))
+	}
+	q.WriteString("ORDER BY creation_time DESC ")
+	// request with pagination - default limit is 200 if no limit is specified
+	if limit == "" {
+		limit = "200"
+	}
+	q.WriteString(fmt.Sprintf("LIMIT %s ", limit))
+	if offset != "" {
+		q.WriteString("OFFSET ")
+		q.WriteString(offset)
+	}
+	err := pgxscan.Select(ctx, p.db, &classCollection, q.String())
+	if err != nil {
+		log.Printf("\n[ERROR]:", err)
+		return nil, err
 	}
 	return classCollection, nil
+}
+
+func (p postgres) GetByID(id string) (Class, error) {
+	var class Class
+	sql := `
+			SELECT * FROM class
+			WHERE id = $1
+		`
+	err := pgxscan.Get(ctx, p.db, &class, sql, id)
+	if err != nil {
+		log.Printf("\n[ERROR]:", err)
+		return Class{}, err
+	}
+	return class, nil
 }
 
 func (p postgres) GetTotalCount() (int64, error) {
@@ -69,7 +83,7 @@ func (p postgres) GetByDateRange(startDate, endDate string) ([]Class, error) {
 	sql := `
 		SELECT * FROM class 
 		WHERE start_date >= $1 AND end_date <= $2 
-		ORDER BY created_at DESC`
+		ORDER BY creation_time DESC`
 	err := pgxscan.Select(ctx, p.db, &classCollection, sql, startDate, endDate)
 	if err != nil {
 		log.Printf("\n[ERROR]:", err)
@@ -165,26 +179,19 @@ func (p postgres) Update(id string, class Class) error {
 	return nil
 }
 
-func (p postgres) GetByID(id string) (Class, error) {
-	var class Class
-	sql := `
-			SELECT * FROM class
-			WHERE ID = $1
-		`
-	err := pgxscan.Get(ctx, p.db, &class, sql, id)
-	if err != nil {
-		log.Printf("\n[ERROR]:", err)
-		return Class{}, err
-	}
-	return class, nil
-}
-
-func (p postgres) GetByName(name string) ([]Class, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (p postgres) Delete(id string) error {
-	//TODO implement me
-	panic("implement me")
+	sql := `
+			DELETE FROM class
+			WHERE id = $1;
+	`
+	res, err := p.db.Exec(ctx, sql, id)
+	if err != nil {
+		return err
+	}
+	rowsAffected := res.RowsAffected()
+	if err != nil || rowsAffected != 1 {
+		log.Print(err)
+		return err
+	}
+	return nil
 }

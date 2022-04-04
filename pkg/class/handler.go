@@ -36,7 +36,9 @@ func NewHandler(r *gin.Engine,
 func (h *Handler) GetAll(c *gin.Context) {
 	limit := c.Query("limit")
 	offset := c.Query("offset")
-	result, err := h.ClassRepository.GetAll(limit, offset)
+	name := c.Query("name")
+
+	result, err := h.ClassRepository.GetAll(limit, offset, name)
 	if err != nil {
 		c.JSON(http.StatusNotFound, c.Error(err))
 	} else {
@@ -56,8 +58,6 @@ func (h *Handler) GetByID(c *gin.Context) {
 		c.JSON(http.StatusOK, result)
 	}
 }
-
-
 
 func (h *Handler) GetTotalCount(c *gin.Context) {
 	result, err := h.ClassRepository.GetTotalCount()
@@ -137,6 +137,6 @@ func (h *Handler) Delete(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusNotFound, c.Error(err))
 	} else {
-		c.JSON(http.StatusOK, "Updated Class with id "+id+" successfully")
+		c.JSON(http.StatusOK, "Deleted Class with id "+id+" successfully")
 	}
 }
