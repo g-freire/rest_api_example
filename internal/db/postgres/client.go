@@ -19,6 +19,7 @@ type ClientPool struct {
 }
 
 func NewPostgresConnectionPool(dbHost string) *pgxpool.Pool {
+	//fmt.Println("Connecting to Postgres at", dbHost)
 	postgresOnce.Do(func() {
 		config, err := pgxpool.ParseConfig(dbHost)
 		//config.MinConns = 25

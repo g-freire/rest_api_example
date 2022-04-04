@@ -6,9 +6,11 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/go-playground/validator.v9"
+	"gym/internal/config"
 	pg "gym/internal/db/postgres"
 	"gym/pkg/booking"
 	"gym/pkg/class"
+	"gym/pkg/constants"
 	"gym/pkg/member"
 	"log"
 	"net/http"
@@ -18,16 +20,17 @@ import (
 	"time"
 )
 
-const (
-	defaultPostgresURILocal = "postgres://gym:gym@localhost:5432/gym?sslmode=disable"
-	defaultPort             = "5000"
-)
-
 func handleVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, "GYM API v1 - 2022-04-03")
 }
+func handleHealthCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, time.Now().UTC())
+}
 
 func main() {
+	// Config loads info from env files
+	conf := config.GetConfig()
+	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 
 	// WEB SERVER SETUP
 	r := gin.Default()
@@ -35,7 +38,7 @@ func main() {
 	r.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	// SQL REPOSITORIES
-	postgresConn := pg.NewPostgresConnectionPool(defaultPostgresURILocal)
+	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
 	classRepository := class.NewRepository(postgresConn)
 	memberRepository := member.NewRepository(postgresConn)
 	bookingRepository := booking.NewRepository(postgresConn)
@@ -43,15 +46,13 @@ func main() {
 	// HTTP HANDLERS
 	validator := validator.New()
 	r.GET("/", handleVersion)
+	r.GET("/health", handleHealthCheck)
 	class.NewHandler(r, "classes", validator, classRepository)
 	member.NewHandler(r, "members", validator, memberRepository)
 	booking.NewHandler(r, "bookings", validator, bookingRepository)
 
 	// SERVER SETUP
-	port := os.Getenv("GIN_PORT")
-	if port == "" {
-		port = defaultPort
-	}
+	port := conf.Port
 	log.Printf("WEB SERVER PORT: %s", port)
 	srv := &http.Server{
 		Addr:    ":" + port,

@@ -5,3 +5,4 @@ config
 logger
 cache
 indexes
+add healthcheck

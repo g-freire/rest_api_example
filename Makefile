@@ -9,19 +9,20 @@ build:
 local:
 	@echo '### STARTING LOCAL DOCKER-COMPOSE'
 	@cp .env.local .env;
-	@docker-compose -f docker-compose.yml up -d
+	@docker-compose -f docker-compose-local.yml up -d --build
 
 stop-local:
 	@echo '### STOPPING LOCAL DOCKER-COMPOSE'
-	@docker-compose -f docker-compose.yml down
+	@docker-compose -f docker-compose-local.yml down --remove-orphans
 
-prod:
-	@echo '### LOADING PRODUCTION ENV'
-	@cp .env.prod .env;
+dev:
+	@echo '### LOADING DEV ENV'
+	@cp .env.dev .env;
+	@docker-compose -f docker-compose-dev.yml up -d --build
 
-down:
-	@echo '### DOCKER COMPOSE DOWN'
-	@docker-compose down --remove-orphans
+stop-dev:
+	@echo '### STOPPING DEV DOCKER-COMPOSE'
+	@docker-compose -f docker-compose-dev.yml down --remove-orphans
 
 test:
 	@go test -v ./...
