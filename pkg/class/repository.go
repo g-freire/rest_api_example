@@ -46,7 +46,7 @@ func (p postgres) GetAll(limit, offset, name string) ([]Class, error) {
 	}
 	err := pgxscan.Select(ctx, p.db, &classCollection, q.String())
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return nil, err
 	}
 	return classCollection, nil
@@ -60,7 +60,7 @@ func (p postgres) GetByID(id string) (Class, error) {
 		`
 	err := pgxscan.Get(ctx, p.db, &class, sql, id)
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return Class{}, err
 	}
 	return class, nil
@@ -74,7 +74,6 @@ func (p postgres) GetTotalCount() (int64, error) {
 		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
 		return 0, err
 	}
-	fmt.Println(total)
 	return total, nil
 }
 
@@ -86,7 +85,7 @@ func (p postgres) GetByDateRange(startDate, endDate string) ([]Class, error) {
 		ORDER BY creation_time DESC`
 	err := pgxscan.Select(ctx, p.db, &classCollection, sql, startDate, endDate)
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return nil, err
 	}
 	return classCollection, nil
@@ -96,7 +95,7 @@ func (p postgres) Save(class Class) error {
 	// saving with pessimistic concurrency control
 	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
 	}
 	defer tx.Rollback(context.TODO())
 
@@ -127,7 +126,7 @@ func (p postgres) Save(class Class) error {
 	}
 	err = tx.Commit(context.TODO())
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
 		return err
 	} else {
 		fmt.Print("\n INSERT COMMITED")
@@ -139,7 +138,7 @@ func (p postgres) Update(id string, class Class) error {
 	// updating with pessimistic concurrency control
 	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
 	}
 	defer tx.Rollback(context.TODO())
 
@@ -171,7 +170,7 @@ func (p postgres) Update(id string, class Class) error {
 	}
 	err = tx.Commit(context.TODO())
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
 		return err
 	} else {
 		fmt.Print("\n INSERT COMMITED")

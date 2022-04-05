@@ -5,6 +5,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"gopkg.in/go-playground/validator.v9"
 	"gym/internal/config"
 	pg "gym/internal/db/postgres"
@@ -20,6 +21,10 @@ import (
 	"time"
 )
 
+const (
+	migrationsRootFolder = "file://migration"
+)
+
 func handleVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, "GYM API v1 - 2022-04-03")
 }
@@ -27,24 +32,29 @@ func handleHealthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, time.Now().UTC())
 }
 
-func main() {
-	// Config loads info from env files
+func setup() *gin.Engine{
+	// CONFIGURATION
 	conf := config.GetConfig()
 	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 
-	// WEB SERVER SETUP
-	r := gin.Default()
-	r.Use(cors.Default())
-	r.Use(gzip.Gzip(gzip.DefaultCompression))
-
-	// SQL REPOSITORIES
+	// MIGRATIONS
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
+	//err := pg.Migrate(conf.PostgresHost, migrationsRootFolder, "up", 0)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	// SQL REPOSITORIES
 	classRepository := class.NewRepository(postgresConn)
 	memberRepository := member.NewRepository(postgresConn)
 	bookingRepository := booking.NewRepository(postgresConn)
 
-	// SERVICE
+	// SERVICES
 	classService := class.NewService(classRepository)
+
+	// WEB SERVER
+	r := gin.Default()
+	r.Use(cors.Default())
+	r.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	// HTTP HANDLERS
 	validator := validator.New()
@@ -53,14 +63,26 @@ func main() {
 	class.NewHandler(r, "classes", validator, classService, classRepository)
 	member.NewHandler(r, "members", validator, memberRepository)
 	booking.NewHandler(r, "bookings", validator, bookingRepository)
+	return r
+}
 
+func main() {
+	r := setup()
+	conf := config.GetConfig()
+	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
+
+	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 	// SERVER SETUP
-	port := conf.Port
-	log.Printf("WEB SERVER PORT: %s", port)
 	srv := &http.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + conf.Port,
 		Handler: r,
 	}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	log.Print(constants.Blue, "WEB SERVER PORT: ", conf.Port, constants.Reset)
 
 	// GRACEFULL SHUTDOWNS
 	//DB
@@ -69,16 +91,10 @@ func main() {
 		defer cancel()
 		err := postgresConn.Close
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("DB SHUTDOWN ERROR")
 		}
 	}()
-
 	//SERVER
-	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
-		}
-	}()
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

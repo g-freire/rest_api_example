@@ -16,7 +16,7 @@ func NewService(ClassRepo ClassRepository) ClassService {
 }
 
 // check if start date is before end date
-func checkTimestampIsValid(startTime, endTime time.Time) bool {
+func CheckTimestampIsValid(startTime, endTime time.Time) bool {
 	if startTime.Before(endTime) {
 		return true
 	} else {
@@ -35,7 +35,7 @@ func (s service) GetByDateRange(startDate, endDate string) ([]Class, error) {
 		return nil, err
 	}
 	// validate time chronology
-	if checkTimestampIsValid(startTime, endTime) == false {
+	if CheckTimestampIsValid(startTime, endTime) == false {
 		return nil, errors.ErrInvalidTimestamp
 	}
 	return  s.ClassRepository.GetByDateRange(startDate, endDate)
@@ -43,7 +43,7 @@ func (s service) GetByDateRange(startDate, endDate string) ([]Class, error) {
 
 func (s service) Save(class Class) error {
 	// validates time chronology
-	if checkTimestampIsValid(class.StartDate, class.EndDate) == false {
+	if CheckTimestampIsValid(class.StartDate, class.EndDate) == false {
 		return errors.ErrInvalidTimestamp
 	}
 	return s.ClassRepository.Save(class)
@@ -51,7 +51,7 @@ func (s service) Save(class Class) error {
 
 func (s service) Update(id string, class Class) error {
 	// validates time chronology
-	if checkTimestampIsValid(class.StartDate, class.EndDate) == false {
+	if CheckTimestampIsValid(class.StartDate, class.EndDate) == false {
 		return errors.ErrInvalidTimestamp
 	}
 	return s.ClassRepository.Update(id, class)
