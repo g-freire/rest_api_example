@@ -4,7 +4,7 @@ metadata:
   name: postgres-pv
   labels:
     type: local
-    app: postgres
+    io.gym.service: postgres
 spec:
   storageClassName: manual
   capacity:

@@ -20,3 +20,9 @@ type ClassRepository interface {
 	Update(id string, class Class) error
 	Delete(id string) error
 }
+
+type ClassService interface {
+	GetByDateRange(startDate, endDate string) ([]Class, error)
+	Save(class Class) error
+	Update(id string, class Class) error
+}

@@ -26,10 +26,6 @@ services:
       - 6000:6000
     depends_on:
       - postgres.db
-    environment:
-      POSTGRES_PASSWORD: gym
-      POSTGRES_USER: gym
-      POSTGRES_DB: gym
     networks:
       - gym-net
 

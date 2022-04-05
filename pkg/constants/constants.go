@@ -12,3 +12,19 @@ const (
 	Gray   = "\033[37m"
 	White  = "\033[97m"
 )
+
+// Errors.
+const (
+	ErrMalformedRequest   string = "Malformed"
+	ErrUnknownResource    string = "Resource Not Found"
+	ErrMissingProperties  string = "Missing Values"
+	ErrRequestDecoding    string = "JSON Decoding Error"
+	ErrRequestBody        string = "Invalid Request Body"
+	ErrAccessTokenInvalid string = "Invalid Access Token"
+	ErrDatabaseOperation  string = "Database Operation Error"
+	ErrInternal           string = "Internal Error"
+	ErrBasicAuth          string = "Invalid Auth"
+	ErrMissingStartTime   string = "Missing 'start' Query Parameters"
+	ErrMissingEndTime     string = "Missing 'end' Query Parameters"
+	ErrWrongURLParamType  string = "URL 'id' Parameter must be a number"
+)

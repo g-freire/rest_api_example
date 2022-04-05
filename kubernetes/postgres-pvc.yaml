@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: postgres-pv-claim
   labels:
-    app: postgres
+    io.gym.service: postgres
 spec:
   storageClassName: manual
   accessModes:

@@ -43,11 +43,14 @@ func main() {
 	memberRepository := member.NewRepository(postgresConn)
 	bookingRepository := booking.NewRepository(postgresConn)
 
+	// SERVICE
+	classService := class.NewService(classRepository)
+
 	// HTTP HANDLERS
 	validator := validator.New()
 	r.GET("/", handleVersion)
 	r.GET("/health", handleHealthCheck)
-	class.NewHandler(r, "classes", validator, classRepository)
+	class.NewHandler(r, "classes", validator, classService, classRepository)
 	member.NewHandler(r, "members", validator, memberRepository)
 	booking.NewHandler(r, "bookings", validator, bookingRepository)
 

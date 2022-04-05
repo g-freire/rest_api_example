@@ -2,15 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
+  labels:
+    io.gym.service: postgres
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      io.gym.service: postgres
   template:
     metadata:
       labels:
-        app: postgres
+        io.gym.service: postgres
+        io.gym.network/app-network: "true"
     spec:
       containers:
         - name: postgres
@@ -24,6 +27,7 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgredb
+      restartPolicy: Always
       volumes:
         - name: postgredb
           persistentVolumeClaim:
