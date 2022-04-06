@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  postgres.db:
+    container_name: postgres.gym
+    image: postgres:14.2
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: gym
+      POSTGRES_USER: gym
+      POSTGRES_DB: gym
+    networks:
+    - gym-net
+#    volumes:
+#      - ./postgres-volume:/var/lib/postgresql/data
+
+#  extractor.redis:
+#    container_name: extractor.redis
+#    image: redis
+#    restart: always
+#    command: redis-server --appendonly yes --requirepass nNS&B#!-,[
+#    ports:
+#      - 6379:6379
+#    networks:
+#      - app-network
+#    volumes:
+#      - ./redis-volume:/data
+
+#volumes:
+#  redis-volume:
+#  postgres-volume:
+
+networks:
+  gym-net:

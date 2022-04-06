@@ -1,0 +1,8 @@
+TODO
+improve responses (error + sucess) https://www.baeldung.com/rest-api-error-handling-best-practices
+mock + unit
+config DONE
+logger
+cache
+indexes
+add healthcheck DONE
