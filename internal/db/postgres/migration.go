@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"errors"
-	"gym/pkg/constants"
+	"gym/internal/constants"
 	"log"
 	"strconv"
 

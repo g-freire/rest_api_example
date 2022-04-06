@@ -1,6 +1,7 @@
 package class
 
 import (
+	"gym/internal/common"
 	"gym/internal/errors"
 	"time"
 )
@@ -15,15 +16,7 @@ func NewService(ClassRepo ClassRepository) ClassService {
 	}
 }
 
-// check if start date is before end date
-func CheckTimestampIsValid(startTime, endTime time.Time) bool {
-	if startTime.Before(endTime) {
-		return true
-	} else {
-		return false
-	}
-}
-
+// this function could be adjusted to this entity to handle hours/minutes depending on the business requirements
 func (s service) GetByDateRange(startDate, endDate string) ([]Class, error) {
 	// cast string to time
 	startTime, err := time.Parse("2006-01-02", startDate)
@@ -35,7 +28,7 @@ func (s service) GetByDateRange(startDate, endDate string) ([]Class, error) {
 		return nil, err
 	}
 	// validate time chronology
-	if CheckTimestampIsValid(startTime, endTime) == false {
+	if common.CheckTimestampIsValid(startTime, endTime) == false {
 		return nil, errors.ErrInvalidTimestamp
 	}
 	return  s.ClassRepository.GetByDateRange(startDate, endDate)
@@ -43,7 +36,13 @@ func (s service) GetByDateRange(startDate, endDate string) ([]Class, error) {
 
 func (s service) Save(class Class) error {
 	// validates time chronology
-	if CheckTimestampIsValid(class.StartDate, class.EndDate) == false {
+	if common.CheckTimestampIsUpToDate(class.StartDate) == false {
+		return errors.ErrOldTimestamp
+	}
+	if common.CheckTimestampIsUpToDate(class.EndDate) == false {
+		return errors.ErrOldTimestamp
+	}
+	if common.CheckTimestampIsValid(class.StartDate, class.EndDate) == false {
 		return errors.ErrInvalidTimestamp
 	}
 	return s.ClassRepository.Save(class)
@@ -51,7 +50,13 @@ func (s service) Save(class Class) error {
 
 func (s service) Update(id string, class Class) error {
 	// validates time chronology
-	if CheckTimestampIsValid(class.StartDate, class.EndDate) == false {
+	if common.CheckTimestampIsUpToDate(class.StartDate) == false {
+		return errors.ErrOldTimestamp
+	}
+	if common.CheckTimestampIsUpToDate(class.EndDate) == false {
+		return errors.ErrOldTimestamp
+	}
+	if common.CheckTimestampIsValid(class.StartDate, class.EndDate) == false {
 		return errors.ErrInvalidTimestamp
 	}
 	return s.ClassRepository.Update(id, class)

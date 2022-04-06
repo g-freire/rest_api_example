@@ -25,3 +25,9 @@ type BookingRepository interface {
 	Update(id string, class Booking) error
 	Delete(id string) error
 }
+
+type BookingService interface {
+	GetByDateRange(startDate, endDate string) ([]Booking, error)
+	Save(class Booking) error
+	Update(id string, class Booking) error
+}

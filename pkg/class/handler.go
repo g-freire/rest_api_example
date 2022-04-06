@@ -3,8 +3,8 @@ package class
 import (
 	"github.com/gin-gonic/gin"
 	"gopkg.in/go-playground/validator.v9"
+	"gym/internal/constants"
 	"gym/internal/errors"
-	"gym/pkg/constants"
 	"net/http"
 	"strconv"
 )
@@ -123,7 +123,7 @@ func (h *Handler) Save(c *gin.Context) {
 			Type:    constants.ErrRequestDecoding,
 			Message: []string{err.Error()}})
 		return
-	} // validate before hitting the db
+	} // validates before hitting the db
 	if err := h.Validate.Struct(class); err != nil {
 		c.JSON(http.StatusBadRequest, errors.Response{
 			Status:  http.StatusBadRequest,
@@ -133,17 +133,17 @@ func (h *Handler) Save(c *gin.Context) {
 	}
 	err := h.ClassService.Save(class)
 	if err != nil {
-		if err == errors.ErrInvalidTimestamp{
+		if err == errors.ErrInvalidTimestamp {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrRequestBody,
 				Message: []string{err.Error()}})
 			return
-		}else{
-		c.JSON(http.StatusBadRequest, errors.Response{
-			Status:  http.StatusBadRequest,
-			Type:    constants.ErrDatabaseOperation,
-			Message: []string{err.Error()}})
+		} else {
+			c.JSON(http.StatusBadRequest, errors.Response{
+				Status:  http.StatusBadRequest,
+				Type:    constants.ErrDatabaseOperation,
+				Message: []string{err.Error()}})
 		}
 	} else {
 		c.JSON(http.StatusCreated, "Created Class Successfully")
@@ -159,7 +159,7 @@ func (h *Handler) Update(c *gin.Context) {
 			Type:    constants.ErrRequestDecoding,
 			Message: []string{err.Error()}})
 		return
-	} // validate before hitting the db
+	} // validates before hitting the db
 	if err := h.Validate.Struct(class); err != nil {
 		c.JSON(http.StatusBadRequest, errors.Response{
 			Status:  http.StatusBadRequest,
@@ -169,13 +169,13 @@ func (h *Handler) Update(c *gin.Context) {
 	}
 	err := h.ClassService.Update(id, class)
 	if err != nil {
-		if err == errors.ErrInvalidTimestamp{
+		if err == errors.ErrInvalidTimestamp {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrRequestBody,
 				Message: []string{err.Error()}})
 			return
-		}else{
+		} else {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrDatabaseOperation,

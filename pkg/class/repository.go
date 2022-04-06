@@ -91,7 +91,7 @@ func (p postgres) GetByDateRange(startDate, endDate string) ([]Class, error) {
 	return classCollection, nil
 }
 
-func (p postgres) Save(class Class) error {
+func (p postgres) zSave(class Class) error {
 	// saving with pessimistic concurrency control
 	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {

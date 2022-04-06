@@ -5,8 +5,8 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"gym/internal/config"
+	"gym/internal/constants"
 	pg "gym/internal/db/postgres"
-	"gym/pkg/constants"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -162,7 +162,6 @@ func TestGETRoutes(t *testing.T) {
 	responseString = "3"
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
-
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// v1/booking - GET

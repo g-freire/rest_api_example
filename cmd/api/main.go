@@ -8,10 +8,10 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"gopkg.in/go-playground/validator.v9"
 	"gym/internal/config"
+	"gym/internal/constants"
 	pg "gym/internal/db/postgres"
 	"gym/pkg/booking"
 	"gym/pkg/class"
-	"gym/pkg/constants"
 	"gym/pkg/member"
 	"log"
 	"net/http"
@@ -32,17 +32,17 @@ func handleHealthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, time.Now().UTC())
 }
 
-func setup() *gin.Engine{
+func setup() *gin.Engine {
 	// CONFIGURATION
 	conf := config.GetConfig()
 	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 
 	// MIGRATIONS
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
-	//err := pg.Migrate(conf.PostgresHost, migrationsRootFolder, "up", 0)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+	err := pg.Migrate(conf.PostgresHost, migrationsRootFolder, "up", 0)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// SQL REPOSITORIES
 	classRepository := class.NewRepository(postgresConn)
 	memberRepository := member.NewRepository(postgresConn)
@@ -50,6 +50,7 @@ func setup() *gin.Engine{
 
 	// SERVICES
 	classService := class.NewService(classRepository)
+	bookingService := booking.NewService(bookingRepository)
 
 	// WEB SERVER
 	r := gin.Default()
@@ -62,16 +63,16 @@ func setup() *gin.Engine{
 	r.GET("/health", handleHealthCheck)
 	class.NewHandler(r, "classes", validator, classService, classRepository)
 	member.NewHandler(r, "members", validator, memberRepository)
-	booking.NewHandler(r, "bookings", validator, bookingRepository)
+	booking.NewHandler(r, "bookings", validator, bookingService, bookingRepository)
 	return r
 }
 
 func main() {
 	r := setup()
 	conf := config.GetConfig()
+	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
 
-	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 	// SERVER SETUP
 	srv := &http.Server{
 		Addr:    ":" + conf.Port,
