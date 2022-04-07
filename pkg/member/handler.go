@@ -2,6 +2,7 @@ package member
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/go-playground/validator.v9"
 	"gym/internal/constants"
@@ -31,6 +32,7 @@ func NewHandler(r *gin.Engine,
 		v1.GET(":id", handler.GetByID)
 		v1.GET("count", handler.GetTotalCount)
 		v1.POST("", handler.Save)
+		v1.POST("/n", handler.SaveMany)
 		v1.PUT(":id", handler.Update)
 		v1.DELETE(":id", handler.Delete)
 	}
@@ -131,6 +133,51 @@ func (h *Handler) Save(c *gin.Context) {
 		c.JSON(http.StatusCreated, gin.H{
 			"Status":  http.StatusCreated,
 			"Id":      id,
+			"Message": msg})
+	}
+}
+
+func (h *Handler) SaveMany(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
+	var members []Member
+	if err := c.BindJSON(&members); err != nil {
+		c.JSON(http.StatusBadRequest, errors.Response{
+			Status:  http.StatusBadRequest,
+			Type:    constants.ErrRequestDecoding,
+			Message: []string{err.Error()}})
+		return
+	}
+	// validates all structs before hitting the db
+	for i, member := range members {
+		if err := h.Validate.Struct(member); err != nil {
+			c.JSON(http.StatusBadRequest, errors.Response{
+				Status:  http.StatusBadRequest,
+				Type:    constants.ErrRequestBody,
+				Message: []string{err.Error(), fmt.Sprintf("Check Member at index %d", i+1)}})
+			return
+		}
+	}
+	count, err := h.MemberRepository.SaveMany(ctx, members)
+	if err != nil {
+		if err == errors.ErrInvalidTimestamp {
+			c.JSON(http.StatusBadRequest, errors.Response{
+				Status:  http.StatusBadRequest,
+				Type:    constants.ErrRequestBody,
+				Message: []string{err.Error()}})
+			return
+		} else {
+			c.JSON(http.StatusBadRequest, errors.Response{
+				Status:  http.StatusBadRequest,
+				Type:    constants.ErrDatabaseOperation,
+				Message: []string{err.Error()}})
+		}
+	} else {
+		msg := "Created Member successfully"
+		c.JSON(http.StatusCreated, gin.H{
+			"Status":  http.StatusCreated,
+			"Total":   count,
 			"Message": msg})
 	}
 }

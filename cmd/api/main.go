@@ -42,10 +42,10 @@ func setup() *gin.Engine {
 
 	// MIGRATIONS
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
-	//err := pg.Migrate(conf.PostgresHost, migrationsRootFolder, "up", 0)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+	err := pg.Migrate(conf.PostgresHost, migrationsRootFolder, "up", 0)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// SQL REPOSITORIES
 	classRepository := class.NewRepository(postgresConn)
 	memberRepository := member.NewRepository(postgresConn)
