@@ -27,6 +27,9 @@ stop-dev:
 test:
 	@go test -v ./...
 
+api-test:
+	@go test -v ./cmd/api
+
 network:
 	@docker network create gym-net
 

@@ -127,7 +127,7 @@ func (h *Handler) Save(c *gin.Context) {
 				Message: []string{err.Error()}})
 		}
 	} else {
-		msg := "Created Class successfully"
+		msg := "Created Member successfully"
 		c.JSON(http.StatusCreated, gin.H{
 			"Status":  http.StatusCreated,
 			"Id":      id,
@@ -170,7 +170,11 @@ func (h *Handler) Update(c *gin.Context) {
 				Message: []string{err.Error()}})
 		}
 	} else {
-		c.JSON(http.StatusOK, "Updated Member with id "+id+" successfully")
+		msg := "Updated Member successfully"
+		c.JSON(http.StatusOK, gin.H{
+			"Status":  http.StatusOK,
+			"Id":      id,
+			"Message": msg})
 	}
 }
 
@@ -193,6 +197,10 @@ func (h *Handler) Delete(c *gin.Context) {
 			Type:    constants.ErrUnknownResource,
 			Message: []string{err.Error()}})
 	} else {
-		c.JSON(http.StatusOK, "Deleted Member with id "+id+" successfully")
+		msg := "Deleted Member successfully"
+		c.JSON(http.StatusOK, gin.H{
+			"Status":  http.StatusOK,
+			"Id":      id,
+			"Message": msg})
 	}
 }

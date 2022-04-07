@@ -18,11 +18,11 @@ import (
 //TODO Add more tests
 
 const (
-	//migrationsTestRootFolder = "file://../../migration"
 	migrationsTestRootFolder = "file://../../migration"
 )
 
 func TestMain(m *testing.M) {
+
 	// Prepare database and seed for the tests
 	conf := config.GetConfig()
 	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
@@ -57,6 +57,7 @@ func resetDB(db *pgxpool.Pool) {
 }
 
 // seeds the database with test data - the creation_data is hardcoded to make sure the test is deterministic
+// we could also have an dedicated QA db instance for this purpose
 func seedDB(db *pgxpool.Pool) {
 	sql := `
 			-- CLASS
@@ -211,6 +212,7 @@ func TestHttpEndpoints(t *testing.T) {
 	////////////////////////////////////////////////////////////////////////////////////////
 	// v1/members
 	////////////////////////////////////////////////////////////////////////////////////////
+	// GET /v1/members/
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/v1/members", nil)
 	r.ServeHTTP(w, req)
@@ -218,6 +220,7 @@ func TestHttpEndpoints(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	//assert.Equal(t, responseString, w.Body.String())
 
+	// GET /v1/members/{:id}
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/v1/members/1", nil)
 	r.ServeHTTP(w, req)
@@ -225,10 +228,41 @@ func TestHttpEndpoints(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	//assert.Equal(t, responseString, w.Body.String())
 
+	// GET /v1/members/count
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/v1/members/count", nil)
 	r.ServeHTTP(w, req)
 	responseString = "3"
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, responseString, w.Body.String())
+
+	// POST /v1/members/
+	w = httptest.NewRecorder()
+	body = strings.NewReader(`{
+        "name":"Alice"
+	}`)
+	req, _ = http.NewRequest("POST", "/v1/members", body)
+	r.ServeHTTP(w, req)
+	responseString = "{\"Id\":4,\"Message\":\"Created Member successfully\",\"Status\":201}"
+	assert.Equal(t, 201, w.Code)
+	assert.Equal(t, responseString, w.Body.String())
+
+	// UPDATE /v1/members/{:id}
+	w = httptest.NewRecorder()
+	body = strings.NewReader(`{
+	   "name":"Bob"
+	}`)
+	req, _ = http.NewRequest("PUT", "/v1/members/1", body)
+	r.ServeHTTP(w, req)
+	responseString = "{\"Id\":\"1\",\"Message\":\"Updated Member successfully\",\"Status\":200}"
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, responseString, w.Body.String())
+
+	// DELETE /v1/bookings/{:id}
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("DELETE", "/v1/members/3", nil)
+	r.ServeHTTP(w, req)
+	responseString = "{\"Id\":\"3\",\"Message\":\"Deleted Member successfully\",\"Status\":200}"
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
 
