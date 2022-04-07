@@ -80,7 +80,7 @@ func (p postgres) GetByDateRange(ctx context.Context, startDate, endDate string)
 	var bookingCollection []Booking
 	sql := `
 		SELECT * FROM booking 
-		WHERE start_date >= $1 AND end_date <= $2 
+		WHERE date BETWEEN $1 AND $2 
 		ORDER BY creation_time DESC`
 	err := pgxscan.Select(ctx, p.db, &bookingCollection, sql, startDate, endDate)
 	if err != nil {
@@ -90,7 +90,7 @@ func (p postgres) GetByDateRange(ctx context.Context, startDate, endDate string)
 	return bookingCollection, nil
 }
 
-func (p postgres) Save(ctx context.Context, booking Booking) (id int, err error) {
+func (p postgres) Save(ctx context.Context, booking Booking) (id int64, err error) {
 	// saving with pessimistic concurrency control
 	tx, err := p.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
@@ -106,12 +106,17 @@ func (p postgres) Save(ctx context.Context, booking Booking) (id int, err error)
 			member_id,  
 			date
 		)
-		SELECT $1, $2, $3
-		WHERE $3 
-		BETWEEN (select start_date from class as c where id = c.id)
-		AND     (select end_date from class as c where id = c.id)
+		SELECT $1::bigint, $2, $3::timestamp
+		WHERE EXISTS(
+			SELECT id from class c
+			WHERE id=$1::bigint
+			AND $3::timestamp
+			BETWEEN (SELECT start_date FROM class as c where  c.id=$1::bigint)
+			AND     (SELECT end_date FROM class as c where c.id=$1::bigint)
+		)
         RETURNING ID;
 	`
+	//CAST($1 AS VARCHAR)
 	// QueryRow is used instead of Exec because of postgres returning property
 	err = tx.QueryRow(ctx, tsql,
 		booking.ClassId,

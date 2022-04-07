@@ -83,7 +83,6 @@ func seedDB(db *pgxpool.Pool) {
 	}
 }
 
-
 func TestHttpEndpoints(t *testing.T) {
 	log.Print(constants.Yellow + "------------------------------------------------------------" + constants.Reset)
 	log.Print(constants.Yellow + "STARTING API ENDPOINTS TESTS" + constants.Reset)
@@ -166,7 +165,7 @@ func TestHttpEndpoints(t *testing.T) {
 	// POST /v1/classes/
 	w = httptest.NewRecorder()
 	body := strings.NewReader(`{
-				"name": "pilates2",
+				"name": "muay thay",
 				"start_date": "2022-12-19T00:00:00.000000Z",
 				"end_date": "2022-12-20T00:00:00.000000Z",
 				"capacity": 30
@@ -179,14 +178,28 @@ func TestHttpEndpoints(t *testing.T) {
 
 	w = httptest.NewRecorder()
 	body = strings.NewReader(`{
-				"name": "pilates2",
-				"start_date": "2020-12-19T00:00:00.000000Z",
-				"end_date": "2022-12-20T00:00:00.000000Z",
+				"name": "yoga",
+				"start_date": "2042-12-19T00:00:00.000000Z",
+				"end_date": "2042-12-20T00:00:00.000000Z",
+				"capacity": 32
+	}`)
+	req, _ = http.NewRequest("POST", "/v1/classes", body)
+	r.ServeHTTP(w, req)
+	responseString = "{\"Id\":5,\"Message\":\"Created Class successfully\",\"Status\":201}"
+	assert.Equal(t, 201, w.Code)
+	assert.Equal(t, responseString, w.Body.String())
+
+
+	w = httptest.NewRecorder()
+	body = strings.NewReader(`{
+				"name": "bike",
+				"start_date": "2002-01-19T00:00:00.000000Z",
+				"end_date": "2002-01-20T00:00:00.000000Z",
 				"capacity": 30
 	}`)
 	req, _ = http.NewRequest("POST", "/v1/classes", body)
 	r.ServeHTTP(w, req)
-	responseString = "{\"Status\":400,\"Type\":\"Database Operation Error\",\"Message\":[\"Invalid timestamps: start should be \\u003e current time\"]}"
+	responseString = "{\"Status\":400,\"Type\":\"Invalid Request Body\",\"Message\":[\"Invalid timestamps: start should be \\u003e current time\"]}"
 	assert.Equal(t, 400, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
 
@@ -206,9 +219,9 @@ func TestHttpEndpoints(t *testing.T) {
 
 	// DELETE /v1/classes/{:id}
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("DELETE", "/v1/classes/4", nil)
+	req, _ = http.NewRequest("DELETE", "/v1/classes/5", nil)
 	r.ServeHTTP(w, req)
-	responseString = "{\"Id\":\"4\",\"Message\":\"Deleted Class successfully\",\"Status\":200}"
+	responseString = "{\"Id\":\"5\",\"Message\":\"Deleted Class successfully\",\"Status\":200}"
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
 
@@ -303,9 +316,9 @@ func TestHttpEndpoints(t *testing.T) {
 	// POST /v1/booking/
 	w = httptest.NewRecorder()
 	body = strings.NewReader(`{
-			"class_id": 1,
+			"class_id": 4,
 			"member_id": 1,
-			"date": "2022-12-01T00:00:00.000000Z"
+			"date": "2022-12-18T00:00:00.000000Z"
 	}`)
 	req, _ = http.NewRequest("POST", "/v1/bookings", body)
 	r.ServeHTTP(w, req)
@@ -321,7 +334,7 @@ func TestHttpEndpoints(t *testing.T) {
 	}`)
 	req, _ = http.NewRequest("POST", "/v1/bookings", body)
 	r.ServeHTTP(w, req)
-	responseString = "{\"Status\":400,\"Type\":\"Invalid Request Body\",\"Message\":[\"Invalid timestamps: start \\u003c end\"]}"
+	responseString = "{\"Status\":400,\"Type\":\"Invalid Request Body\",\"Message\":[\"Invalid timestamps: start should be \\u003e current time\"]}"
 	assert.Equal(t, 400, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
 

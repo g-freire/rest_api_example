@@ -60,6 +60,7 @@ func (h *Handler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusOK, result)
 	}
 }
+
 func (h *Handler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
 	defer cancel()
