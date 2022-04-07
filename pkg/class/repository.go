@@ -22,9 +22,7 @@ func NewRepository(db *pgxpool.Pool) *postgres {
 	}
 }
 
-var ctx = context.TODO()
-
-func (p postgres) GetAll(limit, offset, name string) ([]Class, error) {
+func (p postgres) GetAll(ctx context.Context, limit, offset, name string) ([]Class, error) {
 	var classCollection []Class
 	var q strings.Builder
 	q.WriteString(`
@@ -52,7 +50,7 @@ func (p postgres) GetAll(limit, offset, name string) ([]Class, error) {
 	return classCollection, nil
 }
 
-func (p postgres) GetByID(id string) (Class, error) {
+func (p postgres) GetByID(ctx context.Context, id string) (Class, error) {
 	var class Class
 	sql := `
 			SELECT * FROM class
@@ -66,7 +64,7 @@ func (p postgres) GetByID(id string) (Class, error) {
 	return class, nil
 }
 
-func (p postgres) GetTotalCount() (int64, error) {
+func (p postgres) GetTotalCount(ctx context.Context,) (int64, error) {
 	sql := "SELECT COUNT(*) FROM class"
 	var total int64
 	err := p.db.QueryRow(context.Background(), sql).Scan(&total)
@@ -77,7 +75,7 @@ func (p postgres) GetTotalCount() (int64, error) {
 	return total, nil
 }
 
-func (p postgres) GetByDateRange(startDate, endDate string) ([]Class, error) {
+func (p postgres) GetByDateRange(ctx context.Context, startDate, endDate string) ([]Class, error) {
 	var classCollection []Class
 	sql := `
 		SELECT * FROM class 
@@ -91,13 +89,14 @@ func (p postgres) GetByDateRange(startDate, endDate string) ([]Class, error) {
 	return classCollection, nil
 }
 
-func (p postgres) Save(class Class) error {
+func (p postgres) Save(ctx context.Context, class Class) (id int, err error) {
 	// saving with pessimistic concurrency control
-	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
+	tx, err := p.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
 		log.Print("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
+		return 0, err
 	}
-	defer tx.Rollback(context.TODO())
+	defer tx.Rollback(ctx)
 
 	tsql := `
 		 INSERT INTO class (
@@ -106,41 +105,39 @@ func (p postgres) Save(class Class) error {
 				  end_date, 
 				  capacity
 				  )
-		 VALUES ($1, $2, $3, $4)`
-
-	tran, err := tx.Exec(ctx, tsql,
+		 VALUES ($1, $2, $3, $4)
+		 RETURNING id
+`
+	// QueryRow is used instead of Exec because of postgres returning property
+	err = tx.QueryRow(ctx, tsql,
 		class.Name,
 		class.StartDate,
 		class.EndDate,
 		class.Capacity,
-	)
+	).Scan(&id)
 	if err != nil {
 		pg.RollbackTxPgx(tx, err)
-		return err
+		log.Print("\n[ERROR]: TRANSACTION ERROR", err)
+		return 0, err
 	}
-	rowsAffected := tran.RowsAffected()
-	if err != nil || rowsAffected != 1 {
-		log.Print(err)
-		pg.RollbackTxPgx(tx, err)
-		return err
-	}
-	err = tx.Commit(context.TODO())
+
+	err = tx.Commit(ctx)
 	if err != nil {
 		log.Print("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
-		return err
+		return 0, err
 	} else {
-		fmt.Print("\n INSERT COMMITED")
+		//fmt.Print("INSERT COMMITED")
 	}
-	return nil
+	return id, nil
 }
 
-func (p postgres) Update(id string, class Class) error {
+func (p postgres) Update(ctx context.Context, id string, class Class) error {
 	// updating with pessimistic concurrency control
-	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
+	tx, err := p.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
 		log.Print("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
 	}
-	defer tx.Rollback(context.TODO())
+	defer tx.Rollback(ctx)
 
 	tsql := `
 		UPDATE class
@@ -168,17 +165,17 @@ func (p postgres) Update(id string, class Class) error {
 		pg.RollbackTxPgx(tx, err)
 		return err
 	}
-	err = tx.Commit(context.TODO())
+	err = tx.Commit(ctx)
 	if err != nil {
 		log.Print("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
 		return err
 	} else {
-		fmt.Print("\n INSERT COMMITED")
+		//fmt.Print("INSERT COMMITED")
 	}
 	return nil
 }
 
-func (p postgres) Delete(id string) error {
+func (p postgres) Delete(ctx context.Context, id string) error {
 	sql := `
 			DELETE FROM class
 			WHERE id = $1;

@@ -1,16 +1,27 @@
+-- SEED - SERIES GENERATOR
+
+-- eg. creates 10M rows on each table
+
+-- CONST
+set session const.rows = 10000000;
+set session const.booking.id.range = 2;
+
 -- CLASS
-INSERT INTO class(name, start_date, end_date,capacity) VALUES  ('pilates','2021-12-01','2021-12-20', 20);
-INSERT INTO class(name, start_date, end_date,capacity) VALUES  ('crossfit','2021-12-01','2021-12-30', 40);
-INSERT INTO class(name, start_date, end_date,capacity) VALUES  ('jiu-jitsu','2022-04-04','2022-04-20', 30);
+INSERT INTO class(name, start_date, end_date, capacity)
+SELECT md5(RANDOM()::VARCHAR(80)),
+       (NOW() + (random() * (NOW()+'1000 days' - NOW())) + '30 days'),
+       (NOW() + (random() * (NOW()+'1000 days' - NOW())) + '30 days'),
+       (RANDOM()::SMALLINT)
+FROM GENERATE_SERIES(1, current_setting('const.rows')::int);
 
 -- MEMBER
-INSERT INTO member(name) VALUES  ('Alice');
-INSERT INTO member(name) VALUES  ('Bob');
-INSERT INTO member(name) VALUES  ('Charlie');
+INSERT INTO member(name)
+SELECT md5(RANDOM()::VARCHAR(80))
+FROM GENERATE_SERIES(1, current_setting('const.rows')::int);
 
 -- BOOKING
-INSERT INTO booking(class_id, member_id, date) VALUES (1,1,'2021-12-01');
-INSERT INTO booking(class_id, member_id, date) VALUES (2,1,'2021-12-02');
-INSERT INTO booking(class_id, member_id, date) VALUES (1,3,'2021-12-01');
-INSERT INTO booking(class_id, member_id, date) VALUES (1,3,'2021-12-02');
-INSERT INTO booking(class_id, member_id, date) VALUES (1,3,'2021-12-03');
+INSERT INTO booking(class_id, member_id, date)
+SELECT (RANDOM() * current_setting('const.booking.id.range')::int + 1::BIGINT),
+       (RANDOM() * current_setting('const.booking.id.range')::int + 1::BIGINT),
+       (NOW() + (random() * (NOW()+'1000 days' - NOW())) + '30 days')
+FROM GENERATE_SERIES(1, current_setting('const.rows')::int);

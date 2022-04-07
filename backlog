@@ -1,8 +1,12 @@
 TODO
-improve responses (error + sucess) https://www.baeldung.com/rest-api-error-handling-best-practices
-mock + unit
-config DONE
-logger
+indexes 
 cache
-indexes
+logger
+add bulkd insert endpoint
+
+
+
 add healthcheck DONE
+mock + unit 2/2 DONE
+config DONE
+improve responses (error + sucess) https://www.baeldung.com/rest-api-error-handling-best-practices  2/2 DONE

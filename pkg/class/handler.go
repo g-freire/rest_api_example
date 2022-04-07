@@ -1,12 +1,14 @@
 package class
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/go-playground/validator.v9"
+	"gym/internal/constants"
 	"gym/internal/errors"
-	"gym/pkg/constants"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Handler struct {
@@ -40,11 +42,14 @@ func NewHandler(r *gin.Engine,
 }
 
 func (h *Handler) GetAll(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	limit := c.Query("limit")
 	offset := c.Query("offset")
 	name := c.Query("name")
 
-	result, err := h.ClassRepository.GetAll(limit, offset, name)
+	result, err := h.ClassRepository.GetAll(ctx, limit, offset, name)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -56,6 +61,9 @@ func (h *Handler) GetAll(c *gin.Context) {
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	id := c.Param("id")
 	if _, err := strconv.Atoi(id); err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
@@ -64,7 +72,7 @@ func (h *Handler) GetByID(c *gin.Context) {
 			[]string{constants.ErrWrongURLParamType}})
 		return
 	}
-	result, err := h.ClassRepository.GetByID(id)
+	result, err := h.ClassRepository.GetByID(ctx, id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -76,7 +84,10 @@ func (h *Handler) GetByID(c *gin.Context) {
 }
 
 func (h *Handler) GetTotalCount(c *gin.Context) {
-	result, err := h.ClassRepository.GetTotalCount()
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
+	result, err := h.ClassRepository.GetTotalCount(ctx)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -88,6 +99,9 @@ func (h *Handler) GetTotalCount(c *gin.Context) {
 }
 
 func (h *Handler) GetByDateRange(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	start := c.Query("start")
 	if start == "" {
 		c.JSON(http.StatusNotFound, errors.Response{
@@ -104,7 +118,7 @@ func (h *Handler) GetByDateRange(c *gin.Context) {
 			Message: []string{constants.ErrMissingEndTime}})
 		return
 	}
-	result, err := h.ClassService.GetByDateRange(start, end)
+	result, err := h.ClassService.GetByDateRange(ctx, start, end)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -116,6 +130,9 @@ func (h *Handler) GetByDateRange(c *gin.Context) {
 }
 
 func (h *Handler) Save(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	var class Class
 	if err := c.BindJSON(&class); err != nil {
 		c.JSON(http.StatusBadRequest, errors.Response{
@@ -123,7 +140,7 @@ func (h *Handler) Save(c *gin.Context) {
 			Type:    constants.ErrRequestDecoding,
 			Message: []string{err.Error()}})
 		return
-	} // validate before hitting the db
+	} // validates before hitting the db
 	if err := h.Validate.Struct(class); err != nil {
 		c.JSON(http.StatusBadRequest, errors.Response{
 			Status:  http.StatusBadRequest,
@@ -131,26 +148,33 @@ func (h *Handler) Save(c *gin.Context) {
 			Message: []string{err.Error()}})
 		return
 	}
-	err := h.ClassService.Save(class)
+	id, err := h.ClassService.Save(ctx, class)
 	if err != nil {
-		if err == errors.ErrInvalidTimestamp{
+		if err == errors.ErrInvalidTimestamp {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrRequestBody,
 				Message: []string{err.Error()}})
 			return
-		}else{
-		c.JSON(http.StatusBadRequest, errors.Response{
-			Status:  http.StatusBadRequest,
-			Type:    constants.ErrDatabaseOperation,
-			Message: []string{err.Error()}})
+		} else {
+			c.JSON(http.StatusBadRequest, errors.Response{
+				Status:  http.StatusBadRequest,
+				Type:    constants.ErrDatabaseOperation,
+				Message: []string{err.Error()}})
 		}
 	} else {
-		c.JSON(http.StatusCreated, "Created Class Successfully")
+		msg := "Created Class successfully"
+		c.JSON(http.StatusCreated, gin.H{
+			"Status":  http.StatusCreated,
+			"Id":      id,
+			"Message": msg})
 	}
 }
 
 func (h *Handler) Update(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	var class Class
 	id := c.Param("id")
 	if err := c.BindJSON(&class); err != nil {
@@ -159,7 +183,7 @@ func (h *Handler) Update(c *gin.Context) {
 			Type:    constants.ErrRequestDecoding,
 			Message: []string{err.Error()}})
 		return
-	} // validate before hitting the db
+	} // validates before hitting the db
 	if err := h.Validate.Struct(class); err != nil {
 		c.JSON(http.StatusBadRequest, errors.Response{
 			Status:  http.StatusBadRequest,
@@ -167,26 +191,33 @@ func (h *Handler) Update(c *gin.Context) {
 			Message: []string{err.Error()}})
 		return
 	}
-	err := h.ClassService.Update(id, class)
+	err := h.ClassService.Update(ctx, id, class)
 	if err != nil {
-		if err == errors.ErrInvalidTimestamp{
+		if err == errors.ErrInvalidTimestamp {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrRequestBody,
 				Message: []string{err.Error()}})
 			return
-		}else{
+		} else {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrDatabaseOperation,
 				Message: []string{err.Error()}})
 		}
 	} else {
-		c.JSON(http.StatusOK, "Updated Class with id "+id+" successfully")
+		msg := "Updated Class with successfully"
+		c.JSON(http.StatusOK, gin.H{
+			"Status":  http.StatusOK,
+			"Id":      id,
+			"Message": msg})
 	}
 }
 
 func (h *Handler) Delete(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	id := c.Param("id")
 	if _, err := strconv.Atoi(id); err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
@@ -195,13 +226,17 @@ func (h *Handler) Delete(c *gin.Context) {
 			Message: []string{constants.ErrWrongURLParamType}})
 		return
 	}
-	err := h.ClassRepository.Delete(id)
+	err := h.ClassRepository.Delete(ctx, id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
 			Type:    constants.ErrUnknownResource,
 			Message: []string{err.Error()}})
 	} else {
-		c.JSON(http.StatusOK, "Deleted Class with id "+id+" successfully")
+		msg := "Deleted Class successfully"
+		c.JSON(http.StatusOK, gin.H{
+			"Status":  http.StatusOK,
+			"Id":      id,
+			"Message": msg})
 	}
 }

@@ -15,6 +15,7 @@ type Response struct {
 
 var (
 	ErrInvalidTimestamp = errors.New("Invalid timestamps: start < end")
+	ErrOldTimestamp     = errors.New("Invalid timestamps: start should be > current time")
 	ErrBBDDScan         = errors.New("scan bbdd failed")
 	ErrQueryContext     = errors.New("query context Failed")
 	ErrPrepareContext   = errors.New("prepare context failed")

@@ -8,31 +8,34 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"gopkg.in/go-playground/validator.v9"
 	"gym/internal/config"
+	"gym/internal/constants"
 	pg "gym/internal/db/postgres"
 	"gym/pkg/booking"
 	"gym/pkg/class"
-	"gym/pkg/constants"
 	"gym/pkg/member"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 )
 
-const (
-	migrationsRootFolder = "file://migration"
+var (
+	once sync.Once
 )
+var migrationsRootFolder = "file://migration"
 
 func handleVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, "GYM API v1 - 2022-04-03")
 }
+
 func handleHealthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, time.Now().UTC())
 }
 
-func setup() *gin.Engine{
+func setup() *gin.Engine {
 	// CONFIGURATION
 	conf := config.GetConfig()
 	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
@@ -50,6 +53,7 @@ func setup() *gin.Engine{
 
 	// SERVICES
 	classService := class.NewService(classRepository)
+	bookingService := booking.NewService(bookingRepository)
 
 	// WEB SERVER
 	r := gin.Default()
@@ -62,16 +66,20 @@ func setup() *gin.Engine{
 	r.GET("/health", handleHealthCheck)
 	class.NewHandler(r, "classes", validator, classService, classRepository)
 	member.NewHandler(r, "members", validator, memberRepository)
-	booking.NewHandler(r, "bookings", validator, bookingRepository)
+	booking.NewHandler(r, "bookings", validator, bookingService, bookingRepository)
 	return r
 }
 
 func main() {
-	r := setup()
+	var r *gin.Engine
+	once.Do(func() {
+		r = setup()
+	})
+
 	conf := config.GetConfig()
+	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
 
-	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 	// SERVER SETUP
 	srv := &http.Server{
 		Addr:    ":" + conf.Port,
