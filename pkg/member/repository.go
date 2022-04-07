@@ -22,9 +22,7 @@ func NewRepository(db *pgxpool.Pool) *postgres {
 	}
 }
 
-var ctx = context.TODO()
-
-func (p postgres) GetAll(limit, offset, name string) ([]Member, error) {
+func (p postgres) GetAll(ctx context.Context, limit, offset, name string) ([]Member, error) {
 	var memberCollection []Member
 	var q strings.Builder
 	q.WriteString(`
@@ -52,7 +50,7 @@ func (p postgres) GetAll(limit, offset, name string) ([]Member, error) {
 	return memberCollection, nil
 }
 
-func (p postgres) GetByID(id string) (Member, error) {
+func (p postgres) GetByID(ctx context.Context, id string) (Member, error) {
 	var member Member
 	sql := `
 			SELECT * FROM member
@@ -66,60 +64,59 @@ func (p postgres) GetByID(id string) (Member, error) {
 	return member, nil
 }
 
-func (p postgres) GetTotalCount() (int64, error) {
+func (p postgres) GetTotalCount(ctx context.Context) (int64, error) {
 	sql := "SELECT COUNT(*) FROM member"
 	var total int64
-	err := p.db.QueryRow(context.Background(), sql).Scan(&total)
+	err := p.db.QueryRow(ctx, sql).Scan(&total)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
 		return 0, err
 	}
-	fmt.Println(total)
+	//fmt.Println(total)
 	return total, nil
 }
 
-func (p postgres) Save(member Member) error {
+func (p postgres) Save(ctx context.Context, member Member) (id int, err error) {
 	// saving with pessimistic concurrency control
-	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
+	tx, err := p.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
+		return 0, err
 	}
-	defer tx.Rollback(context.TODO())
+	defer tx.Rollback(ctx)
 
 	tsql := `
 		 INSERT INTO member (name)
 		 VALUES ($1)
+		 RETURNING id;
 	`
-	tran, err := tx.Exec(ctx, tsql,
+	// QueryRow is used instead of Exec because of postgres returning property
+	err = tx.QueryRow(ctx, tsql,
 		member.Name,
-	)
+	).Scan(&id)
 	if err != nil {
 		pg.RollbackTxPgx(tx, err)
-		return err
+		log.Print("\n[ERROR]: TRANSACTION ERROR", err)
+		return 0, err
 	}
-	rowsAffected := tran.RowsAffected()
-	if err != nil || rowsAffected != 1 {
-		log.Print(err)
-		pg.RollbackTxPgx(tx, err)
-		return err
-	}
-	err = tx.Commit(context.TODO())
+
+	err = tx.Commit(ctx)
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
-		return err
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
+		return 0, err
 	} else {
-		fmt.Print("\n INSERT COMMITED")
+		//fmt.Print("INSERT COMMITED")
 	}
-	return nil
+	return id, nil
 }
 
-func (p postgres) Update(id string, member Member) error {
+func (p postgres) Update(ctx context.Context, id string, member Member) error {
 	// updating with pessimistic concurrency control
-	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
+	tx, err := p.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
 		log.Printf("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
 	}
-	defer tx.Rollback(context.TODO())
+	defer tx.Rollback(ctx)
 
 	tsql := `
 		UPDATE member
@@ -140,17 +137,17 @@ func (p postgres) Update(id string, member Member) error {
 		pg.RollbackTxPgx(tx, err)
 		return err
 	}
-	err = tx.Commit(context.TODO())
+	err = tx.Commit(ctx)
 	if err != nil {
 		log.Printf("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
 		return err
 	} else {
-		fmt.Print("\n INSERT COMMITED")
+		//fmt.Print("INSERT COMMITED")
 	}
 	return nil
 }
 
-func (p postgres) Delete(id string) error {
+func (p postgres) Delete(ctx context.Context, id string) error {
 	sql := `
 			DELETE FROM member
 			WHERE id = $1;

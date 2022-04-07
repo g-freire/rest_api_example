@@ -1,12 +1,14 @@
 package booking
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/go-playground/validator.v9"
 	"gym/internal/constants"
 	"gym/internal/errors"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Handler struct {
@@ -42,10 +44,13 @@ func NewHandler(r *gin.Engine,
 }
 
 func (h *Handler) GetAll(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	limit := c.Query("limit")
 	offset := c.Query("offset")
 
-	result, err := h.BookingRepository.GetAll(limit, offset)
+	result, err := h.BookingRepository.GetAll(ctx, limit, offset)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -56,6 +61,9 @@ func (h *Handler) GetAll(c *gin.Context) {
 	}
 }
 func (h *Handler) GetByID(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	id := c.Param("id")
 	if _, err := strconv.Atoi(id); err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
@@ -64,7 +72,7 @@ func (h *Handler) GetByID(c *gin.Context) {
 			[]string{constants.ErrWrongURLParamType}})
 		return
 	}
-	result, err := h.BookingRepository.GetByID(id)
+	result, err := h.BookingRepository.GetByID(ctx, id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -76,7 +84,10 @@ func (h *Handler) GetByID(c *gin.Context) {
 }
 
 func (h *Handler) GetTotalCount(c *gin.Context) {
-	result, err := h.BookingRepository.GetTotalCount()
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
+	result, err := h.BookingRepository.GetTotalCount(ctx)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -88,6 +99,9 @@ func (h *Handler) GetTotalCount(c *gin.Context) {
 }
 
 func (h *Handler) GetByDateRange(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	start := c.Query("start")
 	if start == "" {
 		c.JSON(http.StatusNotFound, errors.Response{
@@ -104,7 +118,7 @@ func (h *Handler) GetByDateRange(c *gin.Context) {
 			Message: []string{constants.ErrMissingEndTime}})
 		return
 	}
-	result, err := h.BookingRepository.GetByDateRange(start, end)
+	result, err := h.BookingRepository.GetByDateRange(ctx, start, end)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -116,6 +130,9 @@ func (h *Handler) GetByDateRange(c *gin.Context) {
 }
 
 func (h *Handler) Save(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	var booking Booking
 	if err := c.BindJSON(&booking); err != nil {
 		c.JSON(http.StatusBadRequest, errors.Response{
@@ -131,7 +148,7 @@ func (h *Handler) Save(c *gin.Context) {
 			Message: []string{err.Error()}})
 		return
 	}
-	err := h.BookingRepository.Save(booking)
+	id, err := h.BookingService.Save(ctx, booking)
 	if err != nil {
 		if err == errors.ErrInvalidTimestamp {
 			c.JSON(http.StatusBadRequest, errors.Response{
@@ -146,11 +163,18 @@ func (h *Handler) Save(c *gin.Context) {
 				Message: []string{err.Error()}})
 		}
 	} else {
-		c.JSON(http.StatusCreated, "Created Class Successfully")
+		msg := "Created Booking successfully"
+		c.JSON(http.StatusCreated, gin.H{
+			"Status":  http.StatusCreated,
+			"Id":      id,
+			"Message": msg})
 	}
 }
 
 func (h *Handler) Update(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	var booking Booking
 	id := c.Param("id")
 	if id == "" {
@@ -165,34 +189,59 @@ func (h *Handler) Update(c *gin.Context) {
 		c.JSON(http.StatusNotFound, c.Error(err))
 		return
 	}
-	err := h.BookingRepository.Update(id, booking)
+	err := h.BookingService.Update(ctx, id, booking)
 	if err != nil {
-		c.JSON(http.StatusNotFound, c.Error(err))
+		if err == errors.ErrInvalidTimestamp {
+			c.JSON(http.StatusBadRequest, errors.Response{
+				Status:  http.StatusBadRequest,
+				Type:    constants.ErrRequestBody,
+				Message: []string{err.Error()}})
+			return
+		} else {
+			c.JSON(http.StatusBadRequest, errors.Response{
+				Status:  http.StatusBadRequest,
+				Type:    constants.ErrDatabaseOperation,
+				Message: []string{err.Error()}})
+		}
 	} else {
-		c.JSON(http.StatusOK, "Updated Booking with id "+id+" successfully")
+		msg := "Updated Booking with successfully"
+		c.JSON(http.StatusOK, gin.H{
+			"Status":  http.StatusOK,
+			"Id":      id,
+			"Message": msg})
 	}
 }
 
 func (h *Handler) Delete(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Missing 'id' Query Parameters"})
 		return
 	}
-	err := h.BookingRepository.Delete(id)
+	err := h.BookingRepository.Delete(ctx, id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
 			Type:    constants.ErrUnknownResource,
 			Message: []string{err.Error()}})
 	} else {
-		c.JSON(http.StatusOK, "Deleted Booking with id "+id+" successfully")
+		msg := "Deleted Booking successfully"
+		c.JSON(http.StatusOK, gin.H{
+			"Status":  http.StatusOK,
+			"Id":      id,
+			"Message": msg})
 	}
 }
 
 func (h *Handler) GetAllClassesByMemberId(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	memberID := c.Param("id")
-	result, err := h.BookingRepository.GetAllClassesByMemberId(memberID)
+	result, err := h.BookingRepository.GetAllClassesByMemberId(ctx, memberID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,
@@ -204,8 +253,11 @@ func (h *Handler) GetAllClassesByMemberId(c *gin.Context) {
 }
 
 func (h *Handler) GetAllMembersByClassId(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constants.CTX_DEFAULT*time.Second)
+	defer cancel()
+
 	classId := c.Param("id")
-	result, err := h.BookingRepository.GetAllMembersByClassId(classId)
+	result, err := h.BookingRepository.GetAllMembersByClassId(ctx, classId)
 	if err != nil {
 		c.JSON(http.StatusNotFound, errors.Response{
 			Status:  http.StatusNotFound,

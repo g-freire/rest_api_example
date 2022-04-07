@@ -1,6 +1,7 @@
 package booking
 
 import (
+	"context"
 	"gym/pkg/class"
 	"gym/pkg/member"
 	"time"
@@ -15,19 +16,19 @@ type Booking struct {
 }
 
 type BookingRepository interface {
-	GetAll(limit, offset string) ([]Booking, error)
-	GetByID(id string) (Booking, error)
-	GetByDateRange(startDate, endDate string) ([]Booking, error)
-	GetTotalCount() (int64, error)
-	GetAllClassesByMemberId(memberId string) ([]class.Class, error)
-	GetAllMembersByClassId(classId string) ([]member.Member, error)
-	Save(class Booking) error
-	Update(id string, class Booking) error
-	Delete(id string) error
+	GetAll(ctx context.Context,limit, offset string) ([]Booking, error)
+	GetByID(ctx context.Context,id string) (Booking, error)
+	GetByDateRange(ctx context.Context,startDate, endDate string) ([]Booking, error)
+	GetTotalCount(ctx context.Context) (int64, error)
+	GetAllClassesByMemberId(ctx context.Context, memberId string) ([]class.Class, error)
+	GetAllMembersByClassId(ctx context.Context, classId string) ([]member.Member, error)
+	Save(ctx context.Context,class Booking) (int, error)
+	Update(ctx context.Context, id string, class Booking) error
+	Delete(ctx context.Context, id string) error
 }
 
 type BookingService interface {
-	GetByDateRange(startDate, endDate string) ([]Booking, error)
-	Save(class Booking) error
-	Update(id string, class Booking) error
+	GetByDateRange(ctx context.Context,startDate, endDate string) ([]Booking, error)
+	Save(ctx context.Context,class Booking) (int, error)
+	Update(ctx context.Context,id string, class Booking) error
 }
