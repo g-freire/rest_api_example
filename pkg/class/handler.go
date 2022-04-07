@@ -150,7 +150,7 @@ func (h *Handler) Save(c *gin.Context) {
 	}
 	id, err := h.ClassService.Save(ctx, class)
 	if err != nil {
-		if err ==errors.ErrInvalidTimestamp || err == errors.ErrOldTimestamp{
+		if err == errors.ErrInvalidTimestamp || err == errors.ErrOldTimestamp {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrRequestBody,

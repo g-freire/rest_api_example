@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 	exitVal := m.Run()
 
 	// uncommment to re-create the db state after the tests
-	//resetDB(postgresConn)
+	resetDB(postgresConn)
 	os.Exit(exitVal)
 }
 
@@ -88,7 +88,7 @@ func TestHttpEndpoints(t *testing.T) {
 	log.Print(constants.Yellow + "STARTING API ENDPOINTS TESTS" + constants.Reset)
 	log.Print(constants.Yellow + "------------------------------------------------------------" + constants.Reset)
 
-	r := setup()
+	r, _, _:= setup()
 
 	// GET /version
 	w := httptest.NewRecorder()
@@ -188,7 +188,6 @@ func TestHttpEndpoints(t *testing.T) {
 	responseString = "{\"Id\":5,\"Message\":\"Created Class successfully\",\"Status\":201}"
 	assert.Equal(t, 201, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
-
 
 	w = httptest.NewRecorder()
 	body = strings.NewReader(`{

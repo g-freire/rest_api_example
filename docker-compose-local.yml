@@ -15,15 +15,15 @@ services:
 #    volumes:
 #      - ./postgres-volume:/var/lib/postgresql/data
 
-#  extractor.redis:
-#    container_name: extractor.redis
-#    image: redis
-#    restart: always
-#    command: redis-server --appendonly yes --requirepass nNS&B#!-,[
-#    ports:
-#      - 6379:6379
-#    networks:
-#      - app-network
+  redis.cache:
+    container_name: extractor.redis
+    image: redis
+    restart: always
+    command: redis-server --appendonly yes --requirepass nNS&B#!-,[
+    ports:
+      - 6379:6379
+    networks:
+      - gym-net
 #    volumes:
 #      - ./redis-volume:/data
 

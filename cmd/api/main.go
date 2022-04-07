@@ -5,8 +5,11 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v7"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"gopkg.in/go-playground/validator.v9"
+	"gym/internal/cache"
 	"gym/internal/config"
 	"gym/internal/constants"
 	pg "gym/internal/db/postgres"
@@ -17,14 +20,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 )
 
-var (
-	once sync.Once
-)
 var migrationsRootFolder = "file://migration"
 
 func handleVersion(c *gin.Context) {
@@ -35,10 +34,18 @@ func handleHealthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, time.Now().UTC())
 }
 
-func setup() *gin.Engine {
+func setup() (*gin.Engine, *pgxpool.Pool, *config.Config) {
 	// CONFIGURATION
 	conf := config.GetConfig()
 	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
+
+	// CACHE
+	copts := &redis.UniversalOptions{
+		MasterName: "",
+		Addrs:      []string{conf.RedisAddress},
+		Password:   conf.RedisPassword,
+	}
+	ch := cache.NewClient(*copts)
 
 	// MIGRATIONS
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
@@ -47,7 +54,7 @@ func setup() *gin.Engine {
 		log.Fatal(err)
 	}
 	// SQL REPOSITORIES
-	classRepository := class.NewRepository(postgresConn)
+	classRepository := class.NewRepository(postgresConn, ch)
 	memberRepository := member.NewRepository(postgresConn)
 	bookingRepository := booking.NewRepository(postgresConn)
 
@@ -67,23 +74,16 @@ func setup() *gin.Engine {
 	class.NewHandler(r, "classes", validator, classService, classRepository)
 	member.NewHandler(r, "members", validator, memberRepository)
 	booking.NewHandler(r, "bookings", validator, bookingService, bookingRepository)
-	return r
+	return r, postgresConn, conf
 }
 
 func main() {
-	var r *gin.Engine
-	once.Do(func() {
-		r = setup()
-	})
-
-	conf := config.GetConfig()
-	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
-	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
+	r, postgresConn, conf := setup()
 
 	// SERVER SETUP
 	srv := &http.Server{
-		Addr:    ":" + conf.Port,
 		Handler: r,
+		Addr:    ":" + conf.Port,
 	}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

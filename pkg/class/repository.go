@@ -2,23 +2,29 @@ package class
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"gym/internal/cache"
 	pg "gym/internal/db/postgres"
 	"log"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type postgres struct {
 	db *pgxpool.Pool
+	ch cache.Cache
 }
 
-func NewRepository(db *pgxpool.Pool) *postgres {
+func NewRepository(db *pgxpool.Pool, ch cache.Cache) *postgres {
 	return &postgres{
 		db: db,
+		ch: ch,
 	}
 }
 
@@ -52,19 +58,28 @@ func (p postgres) GetAll(ctx context.Context, limit, offset, name string) ([]Cla
 
 func (p postgres) GetByID(ctx context.Context, id string) (Class, error) {
 	var class Class
-	sql := `
+	// check cache first
+	cacheClass, err := p.ch.Get(id)
+	err = json.Unmarshal([]byte(cacheClass), &class)
+	if err == nil {
+		return class, nil
+	} else {
+		// if not found in cache, get from db
+		sql := `
 			SELECT * FROM class
 			WHERE id = $1
 		`
-	err := pgxscan.Get(ctx, p.db, &class, sql, id)
-	if err != nil {
-		log.Print("\n[ERROR]:", err)
-		return Class{}, err
+		err = pgxscan.Get(ctx, p.db, &class, sql, id)
+		if err != nil {
+			log.Print("\n[ERROR]:", err)
+			return Class{}, err
+		}
+		return class, err
 	}
 	return class, nil
 }
 
-func (p postgres) GetTotalCount(ctx context.Context,) (int64, error) {
+func (p postgres) GetTotalCount(ctx context.Context) (int64, error) {
 	sql := "SELECT COUNT(*) FROM class"
 	var total int64
 	err := p.db.QueryRow(context.Background(), sql).Scan(&total)
@@ -126,6 +141,17 @@ func (p postgres) Save(ctx context.Context, class Class) (id int, err error) {
 		log.Print("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
 		return 0, err
 	} else {
+		// add id to key and struct as value to cache
+		class.Id = int64(id)
+		class.CreationTime = time.Now().UTC()
+		c, err := json.Marshal(class)
+		if err != nil {
+			fmt.Printf("Error: %s", err)
+		}
+		err = p.ch.Set(strconv.FormatInt(int64(id), 10), string(c), 0)
+		if err != nil {
+			fmt.Printf("Error: %s", err)
+		}
 		//fmt.Print("INSERT COMMITED")
 	}
 	return id, nil
