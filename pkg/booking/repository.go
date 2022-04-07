@@ -44,7 +44,7 @@ func (p postgres) GetAll(ctx context.Context, limit, offset string) ([]Booking, 
 	}
 	err := pgxscan.Select(ctx, p.db, &bookingCollection, q.String())
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return nil, err
 	}
 	return bookingCollection, nil
@@ -58,7 +58,7 @@ func (p postgres) GetByID(ctx context.Context, id string) (Booking, error) {
 		`
 	err := pgxscan.Get(ctx, p.db, &booking, sql, id)
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return Booking{}, err
 	}
 	return booking, nil
@@ -84,7 +84,7 @@ func (p postgres) GetByDateRange(ctx context.Context, startDate, endDate string)
 		ORDER BY creation_time DESC`
 	err := pgxscan.Select(ctx, p.db, &bookingCollection, sql, startDate, endDate)
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return nil, err
 	}
 	return bookingCollection, nil
@@ -134,7 +134,7 @@ func (p postgres) Update(ctx context.Context, id string, booking Booking) error 
 	// updating with pessimistic concurrency control
 	tx, err := p.db.BeginTx(context.TODO(), pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
 	}
 	defer tx.Rollback(context.TODO())
 
@@ -164,7 +164,7 @@ func (p postgres) Update(ctx context.Context, id string, booking Booking) error 
 	}
 	err = tx.Commit(context.TODO())
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
 		return err
 	} else {
 		//fmt.Print("INSERT COMMITED")
@@ -197,10 +197,11 @@ func (p postgres) GetAllClassesByMemberId(ctx context.Context, memberID string) 
 		INNER JOIN booking b 
 		ON c.id = b.class_id
 		WHERE b.member_id =$1
+		LIMIT 10000
 		`
 	err := pgxscan.Select(ctx, p.db, &classCollection, sql, memberID)
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return nil, err
 	}
 	return classCollection, nil
@@ -214,10 +215,11 @@ func (p postgres) GetAllMembersByClassId(ctx context.Context, id string) ([]memb
 		INNER JOIN booking b 
 		ON m.id = b.member_id
 		WHERE b.class_id =$1
+		LIMIT 10000
 		`
 	err := pgxscan.Select(ctx, p.db, &memberCollection, sql, id)
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return nil, err
 	}
 	return memberCollection, nil

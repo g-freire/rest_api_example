@@ -19,7 +19,7 @@ const (
 // database context times in sec
 const (
 	CTX_HARD    = 120
-	CTX_DEFAULT = 60
+	CTX_DEFAULT = 600
 	CTX_SOFT    = 20
 )
 

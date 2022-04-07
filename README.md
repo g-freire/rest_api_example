@@ -33,6 +33,9 @@ make local
 
 ```bash
 go test ./...
+or 
+make test
+make api-test
 ```
 #### Creating a migration
 ```bash

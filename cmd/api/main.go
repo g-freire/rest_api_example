@@ -22,13 +22,10 @@ import (
 	"time"
 )
 
-const (
-	migrationsRootFolder = "file://migration"
-)
-
 var (
 	once sync.Once
 )
+var migrationsRootFolder = "file://migration"
 
 func handleVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, "GYM API v1 - 2022-04-03")
@@ -45,10 +42,10 @@ func setup() *gin.Engine {
 
 	// MIGRATIONS
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
-	err := pg.Migrate(conf.PostgresHost, migrationsRootFolder, "up", 0)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err := pg.Migrate(conf.PostgresHost, migrationsRootFolder, "up", 0)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	// SQL REPOSITORIES
 	classRepository := class.NewRepository(postgresConn)
 	memberRepository := member.NewRepository(postgresConn)

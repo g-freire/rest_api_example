@@ -44,7 +44,7 @@ func (p postgres) GetAll(ctx context.Context, limit, offset, name string) ([]Mem
 	}
 	err := pgxscan.Select(ctx, p.db, &memberCollection, q.String())
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return nil, err
 	}
 	return memberCollection, nil
@@ -58,7 +58,7 @@ func (p postgres) GetByID(ctx context.Context, id string) (Member, error) {
 		`
 	err := pgxscan.Get(ctx, p.db, &member, sql, id)
 	if err != nil {
-		log.Printf("\n[ERROR]:", err)
+		log.Print("\n[ERROR]:", err)
 		return Member{}, err
 	}
 	return member, nil
@@ -114,7 +114,7 @@ func (p postgres) Update(ctx context.Context, id string, member Member) error {
 	// updating with pessimistic concurrency control
 	tx, err := p.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: "serializable"})
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT BEGIN", err)
 	}
 	defer tx.Rollback(ctx)
 
@@ -139,7 +139,7 @@ func (p postgres) Update(ctx context.Context, id string, member Member) error {
 	}
 	err = tx.Commit(ctx)
 	if err != nil {
-		log.Printf("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
+		log.Print("\n[ERROR]: TRANSACTION COULD NOT COMMIT \n", err)
 		return err
 	} else {
 		//fmt.Print("INSERT COMMITED")

@@ -28,6 +28,7 @@ func TestMain(m *testing.M) {
 	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
 	resetDB(postgresConn)
+	migrationsRootFolder = migrationsTestRootFolder // workaround for the migration package when called at different folder
 	err := pg.Migrate(conf.PostgresHost, migrationsTestRootFolder, "up", 0)
 	if err != nil {
 		log.Fatal(err)
@@ -81,6 +82,7 @@ func seedDB(db *pgxpool.Pool) {
 		log.Fatal(err)
 	}
 }
+
 
 func TestHttpEndpoints(t *testing.T) {
 	log.Print(constants.Yellow + "------------------------------------------------------------" + constants.Reset)
@@ -258,11 +260,11 @@ func TestHttpEndpoints(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
 
-	// DELETE /v1/bookings/{:id}
+	// DELETE /v1/members/{:id}
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("DELETE", "/v1/members/3", nil)
+	req, _ = http.NewRequest("DELETE", "/v1/members/4", nil)
 	r.ServeHTTP(w, req)
-	responseString = "{\"Id\":\"3\",\"Message\":\"Deleted Member successfully\",\"Status\":200}"
+	responseString = "{\"Id\":\"4\",\"Message\":\"Deleted Member successfully\",\"Status\":200}"
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
 

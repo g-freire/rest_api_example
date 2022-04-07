@@ -1,4 +1,4 @@
-.PHONY : build local stop-local prod down test network prune clean
+.PHONY : build local stop-local prod down test network prune clean test
 
 default: build
 

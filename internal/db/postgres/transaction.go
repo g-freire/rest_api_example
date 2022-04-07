@@ -8,7 +8,7 @@ import (
 
 func RollbackTxPgx(tx pgx.Tx, err error) {
 	if rollbackErr := tx.Rollback(context.TODO()); rollbackErr != nil {
-		log.Printf("\n[ERROR]: UNABLE TO ROLLBACK \n", rollbackErr)
+		log.Print("\n[ERROR]: UNABLE TO ROLLBACK \n", rollbackErr)
 	}
-	log.Printf("\n[ERROR]: TRANSACTION ROLLBACK\n", err)
+	log.Print("\n[ERROR]: TRANSACTION ROLLBACK\n", err)
 }
