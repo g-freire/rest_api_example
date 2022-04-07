@@ -2,19 +2,19 @@
 
 Microservice responsible for main backend services.
 
-![Go](https://img.shields.io/badge/Golang-1.18-blue.svg?logo=go&longCache=true&style=flat)
-![Postgres](https://img.shields.io/badge/Postgres-14.2-lightblue.svg?logo=postgresql&longCache=true&style=flat)
+![Go](https://img.shields.io/badge/go-1.18-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgres-14.2-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-6.2-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
 ## Getting Started
 
-This project uses the **Go** programming language (Golang) and PostgreSQL relational database.
+This project uses the **Go** programming language (Golang), **PostgreSQL** as the relational database and **Redis** as the cache.
 
 ## Steps to run
 
 Clone the repository and enter the folder
 ```bash
-https://gitlab.com/gym-global/backend.git
-cd backend
+git clone https://gitlab.com/gym-global/backend.git && cd backend
 ```
 
 ### Installing
@@ -24,12 +24,25 @@ cd backend
 go mod download
 ```
 
-Compose the local environment
+Compose the local environment (cache + db)
 ```bash
 make local
+make stop-local
 ```
 
-## Running the tests
+Compose the dev environment (app + cache + db)
+```bash
+make dev
+make stop-dev
+```
+
+Run the app locally
+```bash
+go run cmd/api/main.go
+```
+
+
+### Running the tests
 
 ```bash
 go test ./...

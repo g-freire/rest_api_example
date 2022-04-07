@@ -17,7 +17,7 @@ services:
 
   redis.cache:
     container_name: extractor.redis
-    image: redis
+    image: redis:6.2.6
     restart: always
     command: redis-server --appendonly yes --requirepass nNS&B#!-,[
     ports:
