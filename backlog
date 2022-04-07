@@ -1,11 +1,10 @@
 TODO
-indexes 
 cache
 logger
 add bulkd insert endpoint
 
-
-
+indexes DONE
+fix invalid booking DONE
 add healthcheck DONE
 mock + unit 2/2 DONE
 config DONE

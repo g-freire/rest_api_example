@@ -160,7 +160,7 @@ func (h *Handler) Save(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrDatabaseOperation,
-				Message: []string{err.Error(), "Check if the class date is valid"}})
+				Message: []string{err.Error(), constants.MsgClassDateInvalid}})
 		}
 	} else {
 		msg := "Created Booking successfully"

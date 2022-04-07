@@ -14,6 +14,11 @@ const (
 	ErrMissingStartTime   string = "Missing 'start' Query Parameters"
 	ErrMissingEndTime     string = "Missing 'end' Query Parameters"
 	ErrWrongURLParamType  string = "URL 'id' Parameter must be a number"
+
+)
+// Messages
+const (
+	MsgClassDateInvalid   string = "Check if the class date is valid"
 )
 
 // database context times in sec

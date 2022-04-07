@@ -16,6 +16,7 @@ type MemberRepository interface {
 	GetByID(ctx context.Context, id string) (Member, error)
 	GetTotalCount(ctx context.Context) (int64, error)
 	Save(ctx context.Context, class Member) (int, error)
+	SaveMany(ctx context.Context, class []Member) (int, error)
 	Update(ctx context.Context, id string, class Member) error
 	Delete(ctx context.Context, id string) error
 }

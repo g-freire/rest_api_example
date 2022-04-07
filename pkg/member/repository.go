@@ -110,6 +110,24 @@ func (p postgres) Save(ctx context.Context, member Member) (id int, err error) {
 	return id, nil
 }
 
+func (p postgres) SaveMany(ctx context.Context, members []Member) (id int, err error) {
+	var data [][]interface{}
+	for _, member := range members {
+		data = append(data, []interface{}{member.Name})
+	}
+	copyCount, err := p.db.CopyFrom(
+		context.Background(),
+		pgx.Identifier{"member"},
+		[]string{"name"},
+		pgx.CopyFromRows(data),
+	)
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println(copyCount)
+	return id, nil
+}
+
 func (p postgres) Update(ctx context.Context, id string, member Member) error {
 	// updating with pessimistic concurrency control
 	tx, err := p.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: "serializable"})

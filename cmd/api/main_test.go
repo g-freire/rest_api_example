@@ -125,6 +125,7 @@ func TestHttpEndpoints(t *testing.T) {
 	responseString = "{\"id\":2,\"creation_time\":\"2023-01-01T00:00:00Z\",\"name\":\"crossfit\",\"start_date\":\"2021-12-01T00:00:00Z\",\"end_date\":\"2021-12-30T00:00:00Z\",\"capacity\":40}"
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, responseString, w.Body.String())
+
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/v1/classes/1123", nil)
 	r.ServeHTTP(w, req)
