@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -25,9 +26,14 @@ const (
 	migrationsRootFolder = "file://migration"
 )
 
+var (
+	once sync.Once
+)
+
 func handleVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, "GYM API v1 - 2022-04-03")
 }
+
 func handleHealthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, time.Now().UTC())
 }
@@ -68,7 +74,11 @@ func setup() *gin.Engine {
 }
 
 func main() {
-	r := setup()
+	var r *gin.Engine
+	once.Do(func() {
+		r = setup()
+	})
+
 	conf := config.GetConfig()
 	log.Print(constants.Green + "LOAD CONFIG" + constants.Reset)
 	postgresConn := pg.NewPostgresConnectionPool(conf.PostgresHost)
