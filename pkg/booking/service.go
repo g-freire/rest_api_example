@@ -38,7 +38,7 @@ func (s service) GetByDateRange(ctx context.Context,startDate, endDate string) (
 func (s service) Save(ctx context.Context,booking Booking)  (int ,error) {
 	// validates time chronology
 	if common.CheckTimestampIsUpToDate(booking.Date) == false {
-		return 0, errors.ErrInvalidTimestamp
+		return 0, errors.ErrOldTimestamp
 	}
 	return s.BookingRepository.Save(ctx, booking)
 }
@@ -46,7 +46,7 @@ func (s service) Save(ctx context.Context,booking Booking)  (int ,error) {
 func (s service) Update(ctx context.Context,id string, booking Booking) error {
 	// validates time chronology
 	if common.CheckTimestampIsUpToDate(booking.Date) == false {
-		return errors.ErrInvalidTimestamp
+		return errors.ErrOldTimestamp
 	}
 	return s.BookingRepository.Update(ctx, id, booking)
 }

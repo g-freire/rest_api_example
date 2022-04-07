@@ -99,14 +99,18 @@ func (p postgres) Save(ctx context.Context, booking Booking) (id int, err error)
 	}
 	defer tx.Rollback(ctx)
 
+	// checks if the booking date is valid before commiting the transaction
 	tsql := `
-		 INSERT INTO booking (
-				  class_id,
-				  member_id, 
-				  date
-				)
-		 VALUES ($1, $2, $3)
-		 RETURNING ID 
+		INSERT INTO booking (
+			class_id, 
+			member_id,  
+			date
+		)
+		SELECT $1, $2, $3
+		WHERE $3 
+		BETWEEN (select start_date from class as c where id = c.id)
+		AND     (select end_date from class as c where id = c.id)
+        RETURNING ID;
 	`
 	// QueryRow is used instead of Exec because of postgres returning property
 	err = tx.QueryRow(ctx, tsql,

@@ -150,7 +150,7 @@ func (h *Handler) Save(c *gin.Context) {
 	}
 	id, err := h.BookingService.Save(ctx, booking)
 	if err != nil {
-		if err == errors.ErrInvalidTimestamp {
+		if err == errors.ErrInvalidTimestamp || err == errors.ErrOldTimestamp {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrRequestBody,
@@ -160,7 +160,7 @@ func (h *Handler) Save(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, errors.Response{
 				Status:  http.StatusBadRequest,
 				Type:    constants.ErrDatabaseOperation,
-				Message: []string{err.Error()}})
+				Message: []string{err.Error(), "Check if the class date is valid"}})
 		}
 	} else {
 		msg := "Created Booking successfully"
