@@ -18,7 +18,7 @@ func NewService(ClassRepo BookingRepository) BookingService {
 }
 
 // this function could be adjusted to this entity to handle hours/minutes depending on the business requirements
-func (s service) GetByDateRange(ctx context.Context,startDate, endDate string) ([]Booking, error) {
+func (s service) GetByDateRange(ctx context.Context, startDate, endDate string) ([]Booking, error) {
 	// cast string to time
 	startTime, err := time.Parse("2006-01-02", startDate)
 	if err != nil {
@@ -35,7 +35,7 @@ func (s service) GetByDateRange(ctx context.Context,startDate, endDate string) (
 	return s.BookingRepository.GetByDateRange(ctx, startDate, endDate)
 }
 
-func (s service) Save(ctx context.Context,booking Booking)  (int64 ,error) {
+func (s service) Save(ctx context.Context, booking Booking) (int64, error) {
 	// validates time chronology
 	if common.CheckTimestampIsUpToDate(booking.Date) == false {
 		return 0, errors.ErrOldTimestamp
@@ -43,7 +43,7 @@ func (s service) Save(ctx context.Context,booking Booking)  (int64 ,error) {
 	return s.BookingRepository.Save(ctx, booking)
 }
 
-func (s service) Update(ctx context.Context,id string, booking Booking) error {
+func (s service) Update(ctx context.Context, id string, booking Booking) error {
 	// validates time chronology
 	if common.CheckTimestampIsUpToDate(booking.Date) == false {
 		return errors.ErrOldTimestamp

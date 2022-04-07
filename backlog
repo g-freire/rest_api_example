@@ -1,7 +1,9 @@
 TODO
 cache
 logger
-add bulkd insert endpoint
+simple CI
+fix K8
+Documentation
 
 indexes DONE
 fix invalid booking DONE
@@ -9,3 +11,4 @@ add healthcheck DONE
 mock + unit 2/2 DONE
 config DONE
 improve responses (error + sucess) https://www.baeldung.com/rest-api-error-handling-best-practices  2/2 DONE
+add bulkd insert endpoint DONE

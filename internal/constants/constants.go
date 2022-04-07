@@ -14,11 +14,11 @@ const (
 	ErrMissingStartTime   string = "Missing 'start' Query Parameters"
 	ErrMissingEndTime     string = "Missing 'end' Query Parameters"
 	ErrWrongURLParamType  string = "URL 'id' Parameter must be a number"
-
 )
+
 // Messages
 const (
-	MsgClassDateInvalid   string = "Check if the class date is valid"
+	MsgClassDateInvalid string = "Check if the class date is valid"
 )
 
 // database context times in sec
@@ -26,6 +26,7 @@ const (
 	CTX_HARD    = 120
 	CTX_DEFAULT = 600
 	CTX_SOFT    = 20
+	RetryDelayCycles = 5
 )
 
 //CLI colors

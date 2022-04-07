@@ -1,0 +1,985 @@
+{
+	"info": {
+		"_postman_id": "ad427cf2-6b78-4874-ae2f-41d3f6ef48c3",
+		"name": "GYM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Class",
+			"item": [
+				{
+					"name": "SaveClass",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"name\": \"pilates\",\r\n        \"start_date\": \"2023-01-01T00:00:00.000000Z\",\r\n        \"end_date\": \"2023-01-02T00:00:00.000000Z\",\r\n        \"capacity\": 30\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllClasses",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetByID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllClassesByName",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes?name=pilates",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "pilates"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllClassesPagination",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes?limit=2&offset=0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetByDateRange",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes/date?start=2021-12-01&end=2021-12-20",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes",
+								"date"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2021-12-01"
+								},
+								{
+									"key": "end",
+									"value": "2021-12-20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTotalCount",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes/count",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateClass",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"name\": \"soccer\",\r\n        \"start_date\": \"2022-12-18T00:00:00.000000Z\",\r\n        \"end_date\": \"2022-12-20T00:00:00.000000Z\",\r\n        \"capacity\": 102\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteClass",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/classes/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"classes",
+								"4"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Member",
+			"item": [
+				{
+					"name": "Save",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"name\":\"Alice\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SaveMany",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"name\":\"Alice3\"\r\n    },\r\n    {\r\n        \"name\":\"Bob5\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members/n",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members",
+								"n"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetByName",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members?name=14aef07cb2165ffd04ecee2cf1e6598b",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "14aef07cb2165ffd04ecee2cf1e6598b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllPagination",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members?limit=2&offset=0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetByID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTotalCount",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members/count",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"name\": \"BoB\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/members/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"members",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking",
+			"item": [
+				{
+					"name": "SaveBooking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n\t\t\t\"class_id\": 1,\r\n\t\t\t\"member_id\": 1,\r\n\t\t\t\"date\": \"2002-12-19T00:00:00.000000Z\"\r\n    }\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllBooking",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetByID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllBookingByName",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings?name=pilates",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "pilates"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllBookingPagination",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings?limit=2&offset=0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetByDateRange",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings/date?start=12-01-2022&end=12-20-2024",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"date"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "12-01-2022"
+								},
+								{
+									"key": "end",
+									"value": "12-20-2024"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTotalCount",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"total\": 41,\r\n        \"datetime\": \"2020-05-24T21:15:37Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings/count",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllMembersByClassId",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"class_id\": 1,\r\n        \"member_id\": 2,\r\n        \"date\": \"2021-12-01T00:00:00.000000Z\"\r\n    }\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings/class/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"class",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllClassesByMemberId",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"class_id\": 1,\r\n        \"member_id\": 2,\r\n        \"date\": \"2021-12-01T00:00:00.000000Z\"\r\n    }\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings/member/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"member",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"class_id\": 1,\r\n        \"member_id\": 2,\r\n        \"date\": \"2050-12-01T00:00:00.000000Z\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/bookings/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "version",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/health",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

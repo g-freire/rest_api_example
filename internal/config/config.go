@@ -35,14 +35,13 @@ func GetConfig() *Config {
 		receivers = strings.Split(receiversEnv, ",")
 	}
 	port := os.Getenv("GIN_PORT")
-	if port =="" {
+	if port == "" {
 		port = defaultPort
 	}
 	postgresHost := os.Getenv("POSTGRES_HOST")
 	if postgresHost == "" {
 		postgresHost = defaultPostgresURILocal
 	}
-
 
 	return &Config{
 		Environment:    env,

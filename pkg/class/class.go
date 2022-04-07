@@ -19,7 +19,7 @@ type ClassRepository interface {
 	GetByID(ctx context.Context, id string) (Class, error)
 	GetByDateRange(ctx context.Context, startDate, endDate string) ([]Class, error)
 	GetTotalCount(ctx context.Context) (int64, error)
-	Save(ctx context.Context,class Class) (int,error)
+	Save(ctx context.Context, class Class) (int, error)
 	Update(ctx context.Context, id string, class Class) error
 	Delete(ctx context.Context, id string) error
 }

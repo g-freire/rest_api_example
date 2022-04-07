@@ -7,12 +7,12 @@ import (
 
 type addTestValid struct {
 	arg1, arg2 time.Time
-	expected     bool
+	expected   bool
 }
 
 type addTestUpToDate struct {
-	arg1 time.Time
-	expected     bool
+	arg1     time.Time
+	expected bool
 }
 
 var addTests = []addTestValid{

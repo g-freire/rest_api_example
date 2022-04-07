@@ -32,19 +32,19 @@ func (s service) GetByDateRange(ctx context.Context, startDate, endDate string) 
 	if common.CheckTimestampIsValid(startTime, endTime) == false {
 		return nil, errors.ErrInvalidTimestamp
 	}
-	return  s.ClassRepository.GetByDateRange(ctx, startDate, endDate)
+	return s.ClassRepository.GetByDateRange(ctx, startDate, endDate)
 }
 
-func (s service) Save(ctx context.Context, class Class) (int,error) {
+func (s service) Save(ctx context.Context, class Class) (int, error) {
 	// validates time chronology
 	if common.CheckTimestampIsUpToDate(class.StartDate) == false {
 		return 0, errors.ErrOldTimestamp
 	}
 	if common.CheckTimestampIsUpToDate(class.EndDate) == false {
-		return 0,errors.ErrOldTimestamp
+		return 0, errors.ErrOldTimestamp
 	}
 	if common.CheckTimestampIsValid(class.StartDate, class.EndDate) == false {
-		return 0,errors.ErrInvalidTimestamp
+		return 0, errors.ErrInvalidTimestamp
 	}
 	return s.ClassRepository.Save(context.TODO(), class)
 }
