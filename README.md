@@ -1,4 +1,4 @@
-# Gym Backend Core
+# Backend Core
 
 Microservice responsible for main backend services.
 
@@ -6,17 +6,21 @@ Microservice responsible for main backend services.
 ![Postgres](https://img.shields.io/badge/postgres-14.2-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Redis](https://img.shields.io/badge/redis-6.2-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
+### Solution Architecture
+<img src="docs/Solution_Architecture.png" alt="sa" width="450"/>
+
 ## Getting Started
 
 This project uses the **Go** programming language (Golang), **PostgreSQL** as the relational database and **Redis** as the cache.
 
 ## Steps to run
 
+
 Clone the repository and enter the folder
 ```bash
 git clone https://gitlab.com/gym-global/backend.git && cd backend
 ```
-##### At docker compose network
+##### Docker compose network
 Compose the dev environment (app + cache + db)
 ```bash
 make dev
@@ -28,7 +32,7 @@ curl --location --request GET 'http://localhost:6000/health'
 curl --location --request GET 'http://localhost:6000/'
 ```
 
-##### Locally - Kubernetes
+##### Kubernetes
 Apply the definition files
 ```bash
 kubectl apply -f kubernetes
@@ -49,7 +53,7 @@ Scale the pods
 kubectl scale --replicas=3 deployment gym-app
 ```
 
-##### Locally - debug mode
+##### Debug mode
 Compose the local environment (cache + db)
 ```bash
 make local
@@ -64,8 +68,7 @@ Test the app
 ```bash
 curl --location --request GET 'http://localhost:8080/health'
 curl --location --request GET 'http://localhost:8080/'
-
-
+```
 
 ### Running the tests
 
@@ -83,6 +86,3 @@ migrate create -ext sql -dir migration -seq some_migration_name
 ```bash
 bash deploy-img-to-registry.sh
 ```
-
-
-
