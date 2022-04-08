@@ -19,30 +19,17 @@ spec:
         io.gym.network/app-network: "true"
         io.gym.service: gym-app
     spec:
+      terminationGracePeriodSeconds: 30
       containers:
-        - env:
-            - name: ENVIRONMENT
-              valueFrom:
-                configMapKeyRef:
-                  key: ENVIRONMENT
-                  name: env
-            - name: GIN_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: GIN_PORT
-                  name: env
-            - name: POSTGRES_HOST
-              valueFrom:
-                configMapKeyRef:
-                  key: POSTGRES_HOST
-                  name: env
-          # cloud
-          # image: registry.gitlab.com/gym-global/backend/gym:v1
-          # local
+        - name: gin-app
           image: registry.gitlab.com/gym-global/backend/gym:v1
-          name: gin-app
           ports:
             - containerPort: 6000
           resources: {}
+          imagePullPolicy: "Always"
+          envFrom:
+            - configMapRef:
+                name: gym-env
+
       restartPolicy: Always
 status: {}
