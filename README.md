@@ -16,31 +16,34 @@ Clone the repository and enter the folder
 ```bash
 git clone https://gitlab.com/gym-global/backend.git && cd backend
 ```
-
-### Installing
-#### Using GOMODULE
-
-```bash
-go mod download
-```
-
-Compose the local environment (cache + db)
-```bash
-make local
-make stop-local
-```
-
+##### At docker compose network
 Compose the dev environment (app + cache + db)
 ```bash
 make dev
 make stop-dev
 ```
-
-Run the app locally
+Test the app
 ```bash
-go run cmd/api/main.go
+curl --location --request GET 'http://localhost:6000/health'
+curl --location --request GET 'http://localhost:6000/'
 ```
 
+##### Locally - debug mode
+Compose the local environment (cache + db)
+```bash
+make local
+make stop-local
+```
+Install, Build and Run Go binary
+```bash
+go run cmd/api/main.go or
+go mod download && go build -o gym cmd/api/main.go && ./gym
+```
+Test the app
+```bash
+curl --location --request GET 'http://localhost:8080/health'
+curl --location --request GET 'http://localhost:8080/'
+```
 
 ### Running the tests
 
