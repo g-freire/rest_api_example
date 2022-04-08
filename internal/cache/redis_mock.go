@@ -1,9 +1,9 @@
 package cache
 
 import (
-"time"
+	"time"
 
-"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/mock"
 )
 
 type Mock struct {
@@ -49,4 +49,3 @@ func (m Mock) Ping() (string, error) {
 	args := m.Called()
 	return args.String(0), args.Error(1)
 }
-

@@ -40,5 +40,5 @@ workspace.xml
 tasks.xml files.
 
 .env
-kubernetes/
 backlog
+k6/

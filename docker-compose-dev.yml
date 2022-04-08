@@ -29,15 +29,15 @@ services:
     networks:
       - gym-net
 
-#  redis.cache:
-#    container_name: gym.redis
-#    image: redis
-#    restart: always
-#    command: redis-server --appendonly yes --requirepass nNS&B#!-,[
-#    ports:
-#      - 6379:6379
-#    networks:
-#      - app-network
+  redis.cache:
+    container_name: redis.redis
+    image: redis:6.2.6
+    restart: always
+    command: redis-server --appendonly yes --requirepass nNS&B#!-,[
+    ports:
+      - 6379:6379
+    networks:
+      - gym-net
 #    volumes:
 #      - ./redis-volume:/data
 

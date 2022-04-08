@@ -88,7 +88,7 @@ func TestHttpEndpoints(t *testing.T) {
 	log.Print(constants.Yellow + "STARTING API ENDPOINTS TESTS" + constants.Reset)
 	log.Print(constants.Yellow + "------------------------------------------------------------" + constants.Reset)
 
-	r, _, _:= setup()
+	r, _, _ := setup()
 
 	// GET /version
 	w := httptest.NewRecorder()

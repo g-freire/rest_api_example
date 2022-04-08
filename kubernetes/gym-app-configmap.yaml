@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    io.gym.service: gym-env
+  name: env
+data:
+  ENVIRONMENT: DEV
+  GIN_PORT: '6000'
+  POSTGRES_HOST: postgres://gym:gym@postgres.db:5432/gym?sslmode:disable
+  POSTGRES_USER: gym
+  POSTGRES_PASSWORD: gym
+  POSTGRES_DATABASE: gym
+  EMAIL_SENDER: ''
+  EMAIL_RECEIVERS: ''
+  EMAIL_API_KEY: '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'
+

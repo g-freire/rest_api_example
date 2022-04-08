@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gym-pod
+spec:
+  containers:
+  - name: gym-pod-ctn
+    image: docker.io/library/gym:latest
+    imagePullPolicy: Never  # or IfNotPresent
+
+# kind load docker-image gym:latest
