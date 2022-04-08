@@ -20,6 +20,24 @@ Clone the repository and enter the folder
 ```bash
 git clone https://gitlab.com/gym-global/backend.git && cd backend
 ```
+
+##### Debug mode
+Compose the local environment (cache + db)
+```bash
+make local
+make stop-local
+```
+Install, Build and Run Go binary
+```bash
+go run cmd/api/main.go or
+go mod download && go build -o gym cmd/api/main.go && ./gym
+```
+Test the app
+```bash
+curl --location --request GET 'http://localhost:8080/health'
+curl --location --request GET 'http://localhost:8080/'
+```
+
 ##### Docker compose network
 Compose the dev environment (app + cache + db)
 ```bash
@@ -51,23 +69,6 @@ curl --location --request GET 'http://localhost:5555/'
 Scale the pods
 ```bash
 kubectl scale --replicas=3 deployment gym-app
-```
-
-##### Debug mode
-Compose the local environment (cache + db)
-```bash
-make local
-make stop-local
-```
-Install, Build and Run Go binary
-```bash
-go run cmd/api/main.go or
-go mod download && go build -o gym cmd/api/main.go && ./gym
-```
-Test the app
-```bash
-curl --location --request GET 'http://localhost:8080/health'
-curl --location --request GET 'http://localhost:8080/'
 ```
 
 ### Running the tests
