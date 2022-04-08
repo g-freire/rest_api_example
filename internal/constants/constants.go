@@ -23,9 +23,9 @@ const (
 
 // database context times in sec
 const (
-	CTX_HARD    = 120
-	CTX_DEFAULT = 600
-	CTX_SOFT    = 20
+	CTX_HARD         = 120
+	CTX_DEFAULT      = 600
+	CTX_SOFT         = 20
 	RetryDelayCycles = 5
 )
 

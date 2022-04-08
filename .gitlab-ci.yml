@@ -28,7 +28,7 @@ stages:
 format:
   stage: test
   script:
-    - go fmt $(go list ./... | grep -v /vendor/)
+    - go fmt ./...
     - go test -v ./...
 #    - go vet $(go list ./... | grep -v /vendor/)
 #    - go test -race $(go list ./... | grep -v /vendor/)

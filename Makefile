@@ -6,6 +6,9 @@ build:
 	@echo '### BUILDING GO BINARY'
 	@go build -o api cmd/api/main.go
 
+run:
+	@go run cmd/api/main.go
+
 local:
 	@echo '### STARTING LOCAL DOCKER-COMPOSE'
 	@cp .env.local .env;

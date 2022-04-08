@@ -19,7 +19,7 @@ services:
     container_name: redis.cache
     image: redis:6.2.6
     restart: always
-    command: redis-server --appendonly yes --requirepass nNS&B#!-,[
+    command: redis-server --appendonly yes
     ports:
       - 6379:6379
     networks:
