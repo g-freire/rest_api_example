@@ -28,6 +28,27 @@ curl --location --request GET 'http://localhost:6000/health'
 curl --location --request GET 'http://localhost:6000/'
 ```
 
+##### Locally - Kubernetes
+Apply the definition files
+```bash
+kubectl apply -f kubernetes
+```
+Get pod name and port-foward 
+```bash
+kubectl get pods
+kubectl port-forward {pod-name} 5555:6000 
+eg. kubectl port-forward gym-app-5bcb8c5c4d-cxbp9 5555:6000
+```
+Test the app
+```bash
+curl --location --request GET 'http://localhost:5555/health'
+curl --location --request GET 'http://localhost:5555/'
+```
+Scale the pods
+```bash
+kubectl scale --replicas=3 deployment gym-app
+```
+
 ##### Locally - debug mode
 Compose the local environment (cache + db)
 ```bash
@@ -43,7 +64,8 @@ Test the app
 ```bash
 curl --location --request GET 'http://localhost:8080/health'
 curl --location --request GET 'http://localhost:8080/'
-```
+
+
 
 ### Running the tests
 
@@ -57,5 +79,10 @@ make api-test
 ```bash
 migrate create -ext sql -dir migration -seq some_migration_name
 ```
+#### Deploying an img to registry
+```bash
+bash deploy-img-to-registry.sh
+```
+
 
 

@@ -27,7 +27,7 @@ import (
 var migrationsRootFolder = "file://migration"
 
 func handleVersion(c *gin.Context) {
-	c.JSON(http.StatusOK, "GYM API v1 - 2022-04-03")
+	c.JSON(http.StatusOK, "GYM API v1 - 2022-08-03")
 }
 
 func handleHealthCheck(c *gin.Context) {
